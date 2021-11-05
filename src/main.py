@@ -1,20 +1,11 @@
 import androguard
-# This is a sample Python script.
-
-# Press Maj+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import androguard.misc
-
 from src.Methode import Methode
 
-map_methods = {}
-map_instructions = {}
 
-
-def inputFile(apk):
-    analyzedAPK = androguard.misc.AnalyzeAPK(apk)
-    a = analyzedAPK[0]
-    print("Infos générales : \n")
+def input_file(apk):
+    a, d, dx = androguard.misc.AnalyzeAPK(apk)
+    print(a)
     print("Nom de 1\'application : ", a.get_app_name())
     print("Permissions : ", a.get_permissions())
     print("Activité principale:\n ", a.get_main_activity())
@@ -29,7 +20,6 @@ def inputFile(apk):
         print("Declares intent filters:\n", a.get_intent_filters('receiverfl', rec))
     print("\n", "=" * 20)
     print("Récupération des classes DEX : \n")
-    d = analyzedAPK[1]
     main = "L" + a.get_main_activity().replace(".", "/") + ";"
     for classdef in d:
         c = classdef.get_class(main)
@@ -82,9 +72,8 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # inputFile("../apk/app-debug.apk")
+    input_file("../apk/app-debug.apk")
     analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
