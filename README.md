@@ -1,8 +1,10 @@
-# BinaryDecipher
+![](logo/logo.svg)
 
-Projet de securité des application nomades
+# Projet de Securité des Applications Nomades
 
-# Instructions de configuration du projet
+---
+
+## Instructions de configuration du projet
 
 Tout d'abord il faut exécuter la commande :
 
