@@ -12,6 +12,6 @@ pour se placer dans le venv
 
 Ensuite il faut installer les dépendances :
 
-```pip -r requirements.txt```
+```pip install -r requirements.txt```
 
 
