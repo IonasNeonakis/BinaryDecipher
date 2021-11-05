@@ -52,7 +52,7 @@ def analyse_1(apk_file, class_name):
         nb_reg = m.get_information().get("registers")[1] + 1 + len(m.get_information().get("params", []))
         offset = 0
         for instr in list(m.get_instructions()):
-            instructions.append((offset, instr.get_output()))
+            instructions.append((offset, instr.get_name(), instr.get_output()))
             offset += instr.get_length()
         methode = Methode()
         methode.set_instructions(instructions)
