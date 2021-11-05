@@ -5,6 +5,8 @@ import androguard
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import androguard.misc
 
+from src.Methode import Methode
+
 map_methods = {}
 map_instructions = {}
 
@@ -47,25 +49,32 @@ def inputFile(apk):
         #     print("output " ,instr.get_output())
 
 
-# def ŝeudo eijf:
-#     nosMethodes = []
-#     pour chaque methode de la classe:
-#         instructions = []
-#         nbreg = get le nombre de registre
-#         offset = 0
-#         pour chaque instructions:
-#             corps = instr.get_output()
-#             instructions.append((offset, corps))
-#             on incr offset += instr.get_length()
-#         m = Methode()
-#         m.setInstr(instructions)
-#         m.setnbRegister(nbreg)
-#         nosMethodes.append(m)
-#     for m in nosMethodes:
-#         strOutput, bool = m.evaluate()
-#         if !bool:
-#             strOutput > Crapport
-#     "fini succès" > Crapport
+def analyse_1(apk_file, class_name):
+    methode_rencontrer = []
+    apk_analisee = androguard.misc.AnalyzeAPK(apk_file)
+    main = "L" + class_name.replace(".", "/") + ";"
+    for classdef in apk_analisee[1]:
+        c = classdef.get_class(main)
+        if c:
+            break
+    for m in c.get_methods():
+        instructions = []
+        nb_reg = m.get_information().get("registers")[1] + 1 + len(m.get_information().get("params", []))
+        offset = 0
+        for instr in list(m.get_instructions()):
+            instructions.append((offset, instr.get_output()))
+            offset += instr.get_length()
+        methode = Methode()
+        methode.set_instructions(instructions)
+        methode.set_nb_reg(nb_reg)
+        methode.set_informations(m.get_information())
+        methode_rencontrer.append(methode)
+    for m in methode_rencontrer:
+        m.print()
+        message, is_valide = m.evaluate()
+        if not is_valide:
+            return message
+    return message
 
 
 def print_hi(name):
@@ -75,6 +84,7 @@ def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    inputFile("../apk/app-debug.apk")
+    # inputFile("../apk/app-debug.apk")
+    analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
