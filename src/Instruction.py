@@ -7,7 +7,7 @@ class Instruction():
             self._register = [instr.AA]
             self._string = "instruction " + self._name + " enregistre dans v" + str(
                 self._register[0]) + " la valeur " + str(cm.get_string(instr.BBBB))
-        if name[:6] == 'invoke':
+        elif name[:6] == 'invoke':
             cm = instr.cm
             if instr.A == 0:
                 self._register = []
@@ -28,10 +28,44 @@ class Instruction():
                 self._method) + " et utilise les registres : "
             for i in range(len(self._register)):
                 self._string += " v" + str(self._register[i])
-        if name[:4] == 'move':
+        elif name[:4] == 'move':
             self._register = [instr.AA]
             self._string = "instruction " + self._name + " déplace le resultat de l'invoke-kind le plus récent dans v" + str(
                 self._register[0])
+        elif name == 'return-void':
+            self._string = "instruction : " + name + " fais rien (normal)"
+        elif name == 'const':
+            try:
+                self._register = [instr.AA]
+            except:
+                self._register = [instr.A]
+
+            self._string = "instruction " + self._name + " enregistre dans v" + str(
+                str(self._register[0]) + " le/les litteraux suivant : " + str(instr.get_literals()))
+        elif name == 'check-cast':
+            self._type = instr.cm.get_type(instr.BBBB)
+            self._string = "instruction " + name + " vérifie que la valeur du registre v" + str(
+                instr.AA) + " soit de type " + str(self._type)
+        elif name[:2] == 'if':
+            try:
+                self._register = [instr.A, instr.B]
+                self._desination = instr.CCCC
+
+            except:
+                self._register = [instr.AA]
+                self._desination = instr.BBBB
+            self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(self._register) + " en fonction du test specifier. Et si le test est valide renvoie a l'adresse : " + str(
+                self._desination)
+        elif name == 'new-instance':
+            self._register = [instr.AA]
+            self._type = instr.cm.get_type(instr.BBBB)
+            self._string = "instruction : " + name + " créer une instance de type " + str(self._type) + " et la stock dans v"+str(self._register[0])
+        elif name == 'const-class':
+            self._register = [instr.AA]
+            self._type = instr.cm.get_type(instr.BBBB)
+            self._string = "instruction : " + name + " deplace l'instance de type " + str(self._type) + " et la stock dans v"+str(self._register[0])
+        else:
+            self._string = None
 
     def to_string(self):
         print(self._string)

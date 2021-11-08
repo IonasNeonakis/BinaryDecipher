@@ -55,9 +55,10 @@ def analyse_1(apk_file, class_name):
         offset = 0
         for instr in list(m.get_instructions()):
             instructions.append((offset, instr.get_name(), instr.get_output()))
-            if instr.get_name()[:6] == "invoke" or instr.get_name() == "const-string" or instr.get_name()[:4] == "move":
-                instructionTEST = Instruction(instr)
-                print(instructionTEST.to_string())
+            instructionTEST = Instruction(instr)
+            if instructionTEST._string == None:
+                print(instr.get_name() + " n'est pas pris en compte")
+
             offset += instr.get_length()
         methode = Methode()
         methode.set_instructions(instructions)
@@ -65,7 +66,7 @@ def analyse_1(apk_file, class_name):
         methode.set_informations(m.get_information())
         methode_rencontrer.append(methode)
     for m in methode_rencontrer:
-        m.print()
+        # m.print()
         message, is_valide = m.evaluate()
         if not is_valide:
             return message
