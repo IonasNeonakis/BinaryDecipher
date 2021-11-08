@@ -1,5 +1,7 @@
 import androguard
 import androguard.misc
+
+from src.Instruction import Instruction
 from src.Methode import Methode
 
 
@@ -53,6 +55,9 @@ def analyse_1(apk_file, class_name):
         offset = 0
         for instr in list(m.get_instructions()):
             instructions.append((offset, instr.get_name(), instr.get_output()))
+            if instr.get_name()[:6] == "invoke" or instr.get_name() == "const-string" or instr.get_name()[:4] == "move":
+                instructionTEST = Instruction(instr)
+                print(instructionTEST.to_string())
             offset += instr.get_length()
         methode = Methode()
         methode.set_instructions(instructions)
@@ -73,7 +78,7 @@ def print_hi(name):
 
 
 if __name__ == '__main__':
-    input_file("../apk/app-debug.apk")
+    # input_file("../apk/app-debug.apk")
     analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
