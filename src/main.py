@@ -58,6 +58,8 @@ def analyse_1(apk_file, class_name):
             instructionTEST = Instruction(instr)
             if instructionTEST._string == None:
                 print(instr.get_name() + " n'est pas pris en compte")
+            else:
+                print(instructionTEST.to_string())
 
             offset += instr.get_length()
         methode = Methode()
