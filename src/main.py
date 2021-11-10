@@ -42,7 +42,7 @@ def input_file(apk):
 
 
 def analyse_1(apk_file, class_name):
-    methode_rencontrer = []
+    methode_rencontre = []
     apk_analisee = androguard.misc.AnalyzeAPK(apk_file)
     main = "L" + class_name.replace(".", "/") + ";"
     for classdef in apk_analisee[1]:
@@ -57,7 +57,7 @@ def analyse_1(apk_file, class_name):
             instructions.append((offset, instr.get_name(), instr.get_output()))
             instructionTEST = Instruction(instr)
             if instructionTEST._string == None:
-                print(instr.get_name() + " n'est pas pris en compte")
+                print(instr.get_name() + " n'est pas prit en compte")
             else:
                 print(instructionTEST.to_string())
 
@@ -66,8 +66,8 @@ def analyse_1(apk_file, class_name):
         methode.set_instructions(instructions)
         methode.set_nb_reg(nb_reg)
         methode.set_informations(m.get_information())
-        methode_rencontrer.append(methode)
-    for m in methode_rencontrer:
+        methode_rencontre.append(methode)
+    for m in methode_rencontre:
         # m.print()
         message, is_valide = m.evaluate()
         if not is_valide:
@@ -75,13 +75,6 @@ def analyse_1(apk_file, class_name):
     return message
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
 if __name__ == '__main__':
     # input_file("../apk/app-debug.apk")
     analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

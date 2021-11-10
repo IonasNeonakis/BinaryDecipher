@@ -24,7 +24,7 @@ class Instruction():
             self._type = cm.get_type(instr.BBBB)
             self._field = None
             self._method = cm.get_method(instr.BBBB)
-            self._string = "instruction " + self._name + " appel la methode : " + str(
+            self._string = "instruction " + self._name + " appelle la methode : " + str(
                 self._method) + " et utilise les registres : "
             for i in range(len(self._register)):
                 self._string += " v" + str(self._register[i])
@@ -33,7 +33,7 @@ class Instruction():
             self._string = "instruction " + self._name + " déplace le resultat de l'invoke-kind le plus récent dans v" + str(
                 self._register[0])
         elif name == 'return-void':
-            self._string = "instruction : " + name + " fais rien (normal)"
+            self._string = "instruction : " + name + " ne fait rien (normal)"
         elif name == 'const':
             try:
                 self._register = [instr.AA]
@@ -54,16 +54,15 @@ class Instruction():
             except:
                 self._register = [instr.AA]
                 self._desination = instr.BBBB
-            self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(self._register) + " en fonction du test specifier. Et si le test est valide renvoie a l'adresse : " + str(
+            self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(self._register) + " en fonction du test specifier. Et si le test est valide renvoie à l'adresse : " + str(
                 self._desination)
         elif name == 'new-instance':
-            self._register = [instr.AA]
             self._type = instr.cm.get_type(instr.BBBB)
-            self._string = "instruction : " + name + " créer une instance de type " + str(self._type) + " et la stock dans v"+str(self._register[0])
+            self._string = "instruction : " + name + " crée une instance de type " + str(self._type) + " et la stocke dans v"+str(self._register[0])
         elif name == 'const-class':
             self._register = [instr.AA]
             self._type = instr.cm.get_type(instr.BBBB)
-            self._string = "instruction : " + name + " deplace l'instance de type " + str(self._type) + " et la stock dans v"+str(self._register[0])
+            self._string = "instruction : " + name + " deplace l'instance de type " + str(self._type) + " et la stocke dans v"+str(self._register[0])
         else:
             self._string = None
 
