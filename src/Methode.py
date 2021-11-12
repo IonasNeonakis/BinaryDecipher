@@ -16,8 +16,13 @@ class Methode():
     def set_informations(self, informations):
         self._informations = informations
 
+
+    def compute_succ(self):
+        pass
+
     def evaluate(self):
-        return "message d'erreur", True
+        pass
+
 
     def print(self):
         print("Methode {\n    Informations : ", self._informations, "\n    Nombre de registre : ", self._nb_reg, "\n    Instruction : ", self._instructions, "\n}")

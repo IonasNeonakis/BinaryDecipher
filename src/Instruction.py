@@ -49,11 +49,11 @@ class Instruction():
         elif name[:2] == 'if':
             try:
                 self._register = [instr.A, instr.B]
-                self._desination = instr.CCCC
+                self._desination = instr.CCCC * 2
 
             except:
                 self._register = [instr.AA]
-                self._desination = instr.BBBB
+                self._desination = instr.BBBB * 2
             self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(self._register) + " en fonction du test specifier. Et si le test est valide renvoie à l'adresse : " + str(
                 self._desination)
         elif name == 'new-instance':
@@ -69,3 +69,4 @@ class Instruction():
     def to_string(self):
         print(self._string)
         # print(f'instruction {self._name}, enregistre dans v{self._register}', 'la valeur', self._string, " de type : ", self._type, " field : ", self._field)
+
