@@ -1,6 +1,7 @@
 class Instruction():
     def __init__(self, instr):
         name = instr.get_name()
+        self._length = instr.get_length()
         self._name = name
         if name == 'const-string':
             cm = instr.cm
@@ -58,6 +59,7 @@ class Instruction():
                 self._desination)
         elif name == 'new-instance':
             self._type = instr.cm.get_type(instr.BBBB)
+            self._register = [instr.AA]
             self._string = "instruction : " + name + " crée une instance de type " + str(self._type) + " et la stocke dans v"+str(self._register[0])
         elif name == 'const-class':
             self._register = [instr.AA]
@@ -65,6 +67,19 @@ class Instruction():
             self._string = "instruction : " + name + " deplace l'instance de type " + str(self._type) + " et la stocke dans v"+str(self._register[0])
         else:
             self._string = None
+
+    def __repr__(self):
+        return self._string
+
+    def get_destination(self):
+        return self._desination
+
+    def get_name(self):
+        return self._name
+
+
+    def get_length(self):
+        return self._length
 
     def to_string(self):
         print(self._string)
