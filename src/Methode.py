@@ -4,12 +4,15 @@ class Methode():
         self._informations = None
         self._instructions = []
         self._succ = {}
+        self._etat_reg = {}
 
     def set_corps(self, corps):
         self._corps = corps
 
     def set_nb_reg(self, nb_reg):
         self._nb_reg = nb_reg
+        for i in range(nb_reg):
+            self._etat_reg[i] = None
 
     def set_instructions(self, instructions):
         self._instructions = instructions
@@ -25,6 +28,8 @@ class Methode():
                 # destination = offset + valeur a déterminer (par exemple le goto a une destination specifique
             elif instr.get_name()[:2] == "if":
                 destination = offset + instr.get_destination()
+            elif instr.get_name()[:6] == "return":
+                destination = None  # Pas de destination sur le return !!!
             else:
                 destination = offset + instr.get_length()  # Juste l'instruction d'après (car c'est une instruction sequentiel
             self._succ[offset] = (instr, destination)
