@@ -5,6 +5,10 @@ class Methode():
         self._instructions = []
         self._succ = {}
         self._etat_reg = {}
+        self._name = None
+
+    def set_name(self, name):
+        self._name = name
 
     def set_corps(self, corps):
         self._corps = corps
@@ -36,7 +40,29 @@ class Methode():
             offset += instr.get_length()  # Mise à jour de l'offset (adresse de l'instruction suivante
 
     def evaluate(self):
-        return True
+        print("\n")
+        print("=" * 20)
+        print("Début de l'analyse : Méthode " + self._name + "\n")
+        offset = 0  # Début
+        has_next = True
+        is_valide = True
+        while has_next:
+            curr_instr, destination = self._succ.get(offset)
+            print(curr_instr)
+            if curr_instr.get_name()[:6] == "invoke":
+                pass  # On n'attribut aucun type aux registre donc pas de changement
+            elif curr_instr.get_name()[:6] == "return":
+                pass
+            elif curr_instr.get_name() == "const":
+                pass
+
+            next_instr = self._succ.get(destination)  # On get l'instruction suivante
+            if not next_instr:  # S'il n'y en a pas
+                has_next = False  # On stop la boucle
+            else:
+                offset = destination  # Sinon on actualise l'offset pour le tour suivant
+        print("Fin d'analyse : methode valide")
+        return is_valide
 
     def print(self):
         print("Methode {\n    Informations : ", self._informations, "\n    Nombre de registre : ", self._nb_reg,

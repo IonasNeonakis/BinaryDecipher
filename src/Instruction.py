@@ -57,7 +57,7 @@ class Instruction():
                 self._desination = instr.BBBB * 2
             self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(
                 self._register) + " en fonction du test specifier. Et si le test est valide renvoie à l'adresse : " + str(
-                self._desination)
+                self._desination) + " bits suivant"
         elif name == 'new-instance':
             self._type = instr.cm.get_type(instr.BBBB)
             self._register = [instr.AA]
@@ -76,6 +76,9 @@ class Instruction():
 
     def get_destination(self):
         return self._desination
+
+    def get_register(self):
+        return self._register
 
     def get_name(self):
         return self._name

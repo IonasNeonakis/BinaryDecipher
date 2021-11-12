@@ -51,6 +51,7 @@ def analyse_1(apk_file, class_name):
             for m in c.get_methods():  # Pour toutes ses méthodes
                 curr_method = Methode()  # On créer une instance de Methode
                 curr_method.set_informations(m.get_information())  # On set les informations de base
+                curr_method.set_name(m.get_name())
                 curr_method.set_nb_reg(m.get_information().get("registers")[1] + 1 + len(
                     m.get_information().get("params", [])))  # On récupère le nombre de registre
                 curr_method_instr = []  # Cette liste contiendra toutes les instructions de la methode (instance d'Instruction)
