@@ -79,4 +79,5 @@ def analyse_1(apk_file, class_name):
 
 if __name__ == '__main__':
     # input_file("../apk/app-debug.apk")
-    analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
+    # analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
+    analyse_1("../apk/fibo.apk", "com.example.fiboapksan.MainActivity")

@@ -68,6 +68,14 @@ class Instruction():
             self._type = instr.cm.get_type(instr.BBBB)
             self._string = "instruction : " + name + " deplace l'instance de type " + str(
                 self._type) + " et la stocke dans v" + str(self._register[0])
+        elif name == 'const/4':
+            self._string = None  # Todo #A vérifier : que tous les const/4 et const/16 sont traitable dans un seul if
+        elif name == 'goto':
+            self._string = None  # Todo
+        elif name[:7] == 'add-int':
+            self._string = None  # Todo A vérifier : que tous les add-int (add-int/lit8, add-int/2addr etc) sont traitable dans un seul if
+        elif name == 'return':
+            self._string = None  # Todo
         else:
             self._string = None
 
