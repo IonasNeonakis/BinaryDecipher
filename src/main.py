@@ -1,3 +1,5 @@
+import tkinter
+
 import androguard
 import androguard.misc
 
@@ -77,7 +79,60 @@ def analyse_1(apk_file, class_name):
     return "Class not found"
 
 
+from tkinter import filedialog
+
+filename = None
+classname_list = []
+
+
+def get_all_class(filename):
+    global classname_list
+    apk_analisee = androguard.misc.AnalyzeAPK(filename)  # APK à analiser
+    package_name = apk_analisee[0].get_package()
+    package_name = "L"+package_name.replace(".","/")
+    # print(package_name)
+    for classdef in apk_analisee[1]:  # Pour toutes les classes de l'APK
+        for classe in classdef.get_classes():
+            # print(classe.get_name()[:len(package_name)])
+            if(classe.get_name()[:len(package_name)] == package_name):
+                classname_a_traiter = classe.get_name().split("/")
+                if not classname_a_traiter[-1] == "R;" and not classname_a_traiter[-1][:2] == "R$" and not classname_a_traiter[-1] == "BuildConfig;":
+                     print(classe.get_name())
+    print("Done")
+
+
+
+def browseFiles():
+    global filename
+    filename = filedialog.askopenfile(
+                                          title="Select a File",
+                                          filetypes=(("APK",
+                                                      "*.apk*"),
+                                                     ("all files",
+                                                      "*.*"))).name
+    ttk.Label(frm, text=filename).grid(column=2, row=1)
+    get_all_class(filename)
+
+
+
 if __name__ == '__main__':
     # input_file("../apk/app-debug.apk")
     # analyse_1("../apk/app-debug.apk", "fr.univ.secuapp.MainActivity")
-    analyse_1("../apk/fibo.apk", "com.example.fiboapksan.MainActivity")
+    # analyse_1("../apk/fibo.apk", "com.example.fiboapksan.MainActivity")
+
+    from tkinter import *
+    from tkinter import ttk
+
+    root = Tk()
+    frm = ttk.Frame(root, padding=10)
+    frm.grid()
+    ttk.Label(frm, text="Projet SAN!").grid(column=0, row=0)
+    ttk.Label(frm, text="Selectionner l'APK ").grid(column=0, row=1)
+    ttk.Button(frm, text="Parcourir", command=browseFiles).grid(column=1, row=1)
+    if filename:
+        ttk.Label(frm, text=filename).grid(column=2, row=1)
+    else:
+        ttk.Label(frm, text="Aucune APK selectionnée").grid(column=2, row=1)
+
+
+    root.mainloop()
