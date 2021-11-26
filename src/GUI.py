@@ -10,29 +10,36 @@ from src.analyses import analyse_1
 class GUI():
     def __init__(self):
         self._root = Tk()  # Init de la fenetre principal
-        self._titleLabel = Label(self._root, text="BinaryDecipher")  # Titre
-        self._subtitleLabel = Label(self._root, text="Par LegitIT")  # Sous titre
-        self._browseLabel = Label(self._root, text="Choix du fichier APK")
+
+        # Les différentes sections
+        header = Frame(self._root).pack()
+        selection_APK = Frame(self._root).pack()
+        selection_class = Frame(self._root).pack()
+        selection_analyse = Frame(self._root).pack()
+
+        self._titleLabel = Label(header, text="BinaryDecipher")  # Titre
+        self._subtitleLabel = Label(header, text="Par LegitIT")  # Sous titre
         self._titleLabel.pack()
         self._subtitleLabel.pack()
-        self._browseLabel.pack()
 
+        self._browseLabel = Label(selection_APK, text="Choix du fichier APK")
+        self._browseLabel.pack()
         self._apkName = "En attente de l'APK"
-        Button(self._root, text="Parcourir", command=self.browse).pack()
-        self._apkNameLabel = Label(self._root, text=self._apkName)
+        Button(selection_APK, text="Parcourir", command=self.browse).pack()
+        self._apkNameLabel = Label(selection_APK, text=self._apkName)
         self._apkNameLabel.pack()
 
         self._liste_class = ["Choisir une APK d'abord"]
         self._default = StringVar()
         self._default.set(self._liste_class[0])
-        self._optionClass = OptionMenu(self._root, self._default, *self._liste_class)
+        self._optionClass = OptionMenu(selection_class, self._default, *self._liste_class)
         self._optionClass.pack()
 
         self._analyse = tkinter.IntVar()
-        Label(self._root, text="Choix analyse").pack()
-        Radiobutton(self._root, text='Analyse 1', variable=self._analyse, value=1).pack()
-        Radiobutton(self._root, text='Analyse 2', variable=self._analyse, value=2).pack()
-        Radiobutton(self._root, text='Analyse 3', variable=self._analyse, value=3).pack()
+        Label(selection_analyse, text="Choix analyse").pack()
+        Radiobutton(selection_analyse, text='Analyse 1', variable=self._analyse, value=1).pack()
+        Radiobutton(selection_analyse, text='Analyse 2', variable=self._analyse, value=2).pack()
+        Radiobutton(selection_analyse, text='Analyse 3', variable=self._analyse, value=3).pack()
 
         Button(self._root, text="Analyser !", command=self.start_analyse).pack()
 
