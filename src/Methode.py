@@ -48,22 +48,31 @@ class Methode():
         offset = 0  # Début
         has_next = True
         is_valide = True
+
+        params = self._informations.get('params', [])
+        for num_reg, type in params:
+            self._etat_reg[num_reg] = type # Ititialisation des types des registres en fonction des parametres de la methode
+
         while has_next:
             curr_instr, destination = self._succ.get(offset)
             print(curr_instr)
-            if curr_instr.get_name()[:6] == "invoke":
+            if curr_instr.get_name()[:6] == "invoke": # TODO supprimer si on ne l'utilise pas
                 pass  # On n'attribut aucun type aux registre donc pas de changement
-            elif curr_instr.get_name()[:6] == "return":  # TODO return void
+            elif curr_instr.get_name() == "return":  # TODO return void
                 if not self._informations['return'] == self._etat_reg[curr_instr.get_registrer()[0]]:
                     print(
                         "Erreur de type de retour")  # TODO gérer ce cas précis :) genre IONAS par exemple car il a son cahier sur lui.
+            elif curr_instr.get_name() == "const-string":
+                self._etat_reg[curr_instr.get_registrer()[0]] = 'string'
             elif curr_instr.get_name() == "const":
-                pass
+                tab = curr_instr.get_registrer()
+                self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                                            'shr-int', 'ushr-int', 'add-long', 'sub-long', 'mul-long', 'div-long',
                                            'rem-long', 'and-long', 'or-long', 'xor-long', 'shl-long', 'shr-long',
                                            'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float', 'rem-float',
                                            'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:
+
                 pass
 
             next_instr = self._succ.get(destination)  # On get l'instruction suivante

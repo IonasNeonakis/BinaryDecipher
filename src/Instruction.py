@@ -41,6 +41,7 @@ class Instruction():
         elif name == 'const':
             try:
                 self._register = [instr.AA]
+                self._value = [instr.BBBBBBBB]
             except:
                 self._register = [instr.A]
 
@@ -109,6 +110,9 @@ class Instruction():
 
     def get_length(self):
         return self._length
+
+    def get_value(self):
+        return self._value
 
     def to_string(self):
         print(self._string)
