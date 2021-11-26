@@ -5,6 +5,7 @@ import androguard.misc
 
 from src.GUI import GUI
 
+
 def input_file(apk):
     a, d, dx = androguard.misc.AnalyzeAPK(apk)
     print(a)
@@ -39,6 +40,7 @@ def input_file(apk):
             print("length ", instr.get_length())
             print("literaux ", instr.get_literals())
         #     print("output " ,instr.get_output())
+
 
 if __name__ == '__main__':
     gui = GUI()

@@ -17,7 +17,7 @@ class GUI():
         self._subtitleLabel.pack()
         self._browseLabel.pack()
 
-        self._apkName = "Veuillez selectionner une APK"
+        self._apkName = "En attente de l'APK"
         Button(self._root, text="Parcourir", command=self.browse).pack()
         self._apkNameLabel = Label(self._root, text=self._apkName)
         self._apkNameLabel.pack()
