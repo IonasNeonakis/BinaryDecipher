@@ -34,6 +34,8 @@ class Methode():
                 destination = offset + instr.get_destination()
             elif instr.get_name()[:6] == "return":
                 destination = None  # Pas de destination sur le return !!!
+            elif "goto" in instr.get_name():
+                destination = instr.get_destination()
             else:
                 destination = offset + instr.get_length()  # Juste l'instruction d'après (car c'est une instruction sequentiel
             self._succ[offset] = (instr, destination)
@@ -51,9 +53,17 @@ class Methode():
             print(curr_instr)
             if curr_instr.get_name()[:6] == "invoke":
                 pass  # On n'attribut aucun type aux registre donc pas de changement
-            elif curr_instr.get_name()[:6] == "return":
-                pass
+            elif curr_instr.get_name()[:6] == "return":  # TODO return void
+                if not self._informations['return'] == self._etat_reg[curr_instr.get_registrer()[0]]:
+                    print(
+                        "Erreur de type de retour")  # TODO gérer ce cas précis :) genre IONAS par exemple car il a son cahier sur lui.
             elif curr_instr.get_name() == "const":
+                pass
+            elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
+                                           'shr-int', 'ushr-int', 'add-long', 'sub-long', 'mul-long', 'div-long',
+                                           'rem-long', 'and-long', 'or-long', 'xor-long', 'shl-long', 'shr-long',
+                                           'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float', 'rem-float',
+                                           'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:
                 pass
 
             next_instr = self._succ.get(destination)  # On get l'instruction suivante

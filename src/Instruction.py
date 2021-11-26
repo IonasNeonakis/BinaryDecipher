@@ -1,3 +1,6 @@
+from androguard.core.bytecodes.dvm import Instruction23x
+
+
 class Instruction():
     def __init__(self, instr):
         name = instr.get_name()
@@ -50,14 +53,14 @@ class Instruction():
         elif name[:2] == 'if':
             try:
                 self._register = [instr.A, instr.B]
-                self._desination = instr.CCCC * 2
+                self._destination = instr.CCCC * 2
 
             except:
                 self._register = [instr.AA]
-                self._desination = instr.BBBB * 2
+                self._destination = instr.BBBB * 2
             self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(
                 self._register) + " en fonction du test specifier. Et si le test est valide renvoie à l'adresse : " + str(
-                self._desination) + " bits suivant"
+                self._destination) + " bits suivant"
         elif name == 'new-instance':
             self._type = instr.cm.get_type(instr.BBBB)
             self._register = [instr.AA]
@@ -69,13 +72,26 @@ class Instruction():
             self._string = "instruction : " + name + " deplace l'instance de type " + str(
                 self._type) + " et la stocke dans v" + str(self._register[0])
         elif name == 'const/4':
-            self._string = None  # Todo #A vérifier : que tous les const/4 et const/16 sont traitable dans un seul if
+            self._register = [instr.A]
+            self._value = instr.B
+            self._string = 'instruction : ' + name + ' met la valeur ' + str(self._value) + ' dans le registre ' + str(
+                self._register[0])
         elif name == 'goto':
-            self._string = None  # Todo
-        elif name[:7] == 'add-int':
-            self._string = None  # Todo A vérifier : que tous les add-int (add-int/lit8, add-int/2addr etc) sont traitable dans un seul if
+            self._destination = instr.AA * 2
+            self._string = 'instruction : ' + name + " saute à l'offset " + str(self._destination)
+        elif name in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int', 'shr-int', 'ushr-int',
+                      'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
+                      'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float',
+                      'rem-float', 'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:  # Binop
+            operator, type = self._name.split("-")
+            self._register = [instr.AA, instr.BB, instr.BB]
+            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
+                           str(self._register[1]) + " et v" + str(self._register[2]) + " et le stocke dans " + str(
+                self._register[0])
         elif name == 'return':
-            self._string = None  # Todo
+            self._register = [instr.AA]
+            self._string = "instruction : " + name + " renvoie la valeur contenue dans le registre v" + str(
+                self._register[0])
         else:
             self._string = None
 
@@ -83,7 +99,7 @@ class Instruction():
         return self._string
 
     def get_destination(self):
-        return self._desination
+        return self._destination
 
     def get_register(self):
         return self._register
