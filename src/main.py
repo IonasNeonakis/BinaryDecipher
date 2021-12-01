@@ -46,5 +46,5 @@ def input_file(apk):
 if __name__ == '__main__':
     #gui = GUI()
     # input_file("../apk/app-debug.apk")
-    analyse_1("../apk/app-debug.apk", "Lfr/univ/secuapp/MainActivity;")
-    #analyse_1("../apk/fibo.apk", "Lcom/example/fiboapksan/MainActivity;")
+    #analyse_1("../apk/app-debug.apk", "Lfr/univ/secuapp/MainActivity;")
+    analyse_1("../apk/fibo.apk", "Lcom/example/fiboapksan/MainActivity;")

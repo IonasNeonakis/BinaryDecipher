@@ -51,29 +51,39 @@ class Methode():
 
         params = self._informations.get('params', [])
         for num_reg, type in params:
-            self._etat_reg[num_reg] = type # Ititialisation des types des registres en fonction des parametres de la methode
+            self._etat_reg[
+                num_reg] = type  # Ititialisation des types des registres en fonction des parametres de la methode
 
         while has_next:
             curr_instr, destination = self._succ.get(offset)
             print(curr_instr)
-            if curr_instr.get_name()[:6] == "invoke": # TODO supprimer si on ne l'utilise pas
+            if curr_instr.get_name()[:6] == "invoke":  # TODO supprimer si on ne l'utilise pas
                 pass  # On n'attribut aucun type aux registre donc pas de changement
             elif curr_instr.get_name() == "return":  # TODO return void
-                if not self._informations['return'] == self._etat_reg[curr_instr.get_registrer()[0]]:
+                if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]]:
                     print(
-                        "Erreur de type de retour")  # TODO gérer ce cas précis :) genre IONAS par exemple car il a son cahier sur lui.
+                        "Erreur de type de retour")
             elif curr_instr.get_name() == "const-string":
-                self._etat_reg[curr_instr.get_registrer()[0]] = 'string'
+                self._etat_reg[curr_instr.get_register()[0]] = 'string'
             elif curr_instr.get_name() == "const":
-                tab = curr_instr.get_registrer()
+                tab = curr_instr.get_register()
                 self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
-                                           'shr-int', 'ushr-int', 'add-long', 'sub-long', 'mul-long', 'div-long',
-                                           'rem-long', 'and-long', 'or-long', 'xor-long', 'shl-long', 'shr-long',
-                                           'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float', 'rem-float',
-                                           'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:
+                                           'shr-int', 'ushr-int']:
+                tab = curr_instr.get_register()
+                if self._etat_reg[tab[1]] != 'int' or self._etat_reg[tab[2]] != 'int':
+                    print('Erreur dans les registres, ce ne sont pas des int')
+                self._etat_reg[tab[0]] = 'int'
 
-                pass
+            elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int', 'shr-int', 'ushr-int',
+                                           'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
+                                           'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float',
+                                           'rem-float', 'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:  # Binop
+                _, type = self._name.split("-")
+                tab = curr_instr.get_register()
+                if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
+                    print('Erreur dans les registres, ce ne sont pas des ', type)
+                self._etat_reg[tab[0]] = type
 
             next_instr = self._succ.get(destination)  # On get l'instruction suivante
             if not next_instr:  # S'il n'y en a pas

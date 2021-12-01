@@ -23,6 +23,7 @@ def analyse_1(apk_file, class_name):
                     if instr._string is None:  # Si ce type d'instruction n'est pas gérer
                         print(
                             instruction.get_name() + " n'est pas prise en compte")  # On l'affiche pour qu'on puisse l'ajouter
+
                     else:
                         curr_method_instr.append(instr)  # Sinon on ajoute l'instruction a la liste
                 curr_method.set_instructions(
