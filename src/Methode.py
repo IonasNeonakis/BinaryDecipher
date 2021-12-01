@@ -57,6 +57,7 @@ class Methode():
         while has_next:
             curr_instr, destination = self._succ.get(offset)
             print(curr_instr)
+
             if curr_instr.get_name()[:6] == "invoke":  # TODO supprimer si on ne l'utilise pas
                 pass  # On n'attribut aucun type aux registre donc pas de changement
             elif curr_instr.get_name() == "return":  # TODO return void
@@ -75,22 +76,39 @@ class Methode():
                     print('Erreur dans les registres, ce ne sont pas des int')
                 self._etat_reg[tab[0]] = 'int'
 
-            elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int', 'shr-int', 'ushr-int',
-                                           'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
-                                           'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float',
-                                           'rem-float', 'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:  # Binop
+            elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int',
+                                           'xor-int', 'shl-int', 'shr-int', 'ushr-int', 'add-long', 'sub-long',
+                                           'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
+                                           'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float',
+                                           'div-float', 'rem-float', 'add-double', 'sub-double', 'mul-double',
+                                           'div-double', 'rem-double']:  # Binop
                 _, type = self._name.split("-")
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
-                    print('Erreur dans les registres, ce ne sont pas des ', type)
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' \033[0m')
                 self._etat_reg[tab[0]] = type
+
+            elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
+                tab = curr_instr.get_register()
+                if tab[1] != 'int' or tab[2] != 'int' :
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int  \033[0m')
+
+                self._etat_reg[tab[0]] = 'int'
+
+            elif curr_instr.get_name()[-5:] == '2addr': # exemple :  sub-int/2addr
+                tab = curr_instr.get_register()
+                nom, type = curr_instr.get_name()[:-5].split('-')
+                if tab[0] != type or tab[1] != type:
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des '+ type +'\033[0m')
+            else:
+                print('\033[91m' +curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
 
             next_instr = self._succ.get(destination)  # On get l'instruction suivante
             if not next_instr:  # S'il n'y en a pas
                 has_next = False  # On stop la boucle
             else:
                 offset = destination  # Sinon on actualise l'offset pour le tour suivant
-        print("Fin d'analyse : methode valide")
+            print("Fin d'analyse : methode valide")
         return is_valide
 
     def print(self):

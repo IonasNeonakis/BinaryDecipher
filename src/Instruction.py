@@ -80,7 +80,8 @@ class Instruction():
         elif name == 'goto':
             self._destination = instr.AA * 2
             self._string = 'instruction : ' + name + " saute à l'offset " + str(self._destination)
-        elif name in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int', 'shr-int', 'ushr-int',
+        elif name in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
+                      'shr-int', 'ushr-int',
                       'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
                       'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float', 'div-float',
                       'rem-float', 'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:  # Binop
@@ -89,6 +90,25 @@ class Instruction():
             self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
                            str(self._register[1]) + " et v" + str(self._register[2]) + " et le stocke dans " + str(
                 self._register[0])
+
+        elif name[-4:] == 'lit8' or name[-5:] == 'lit16':
+            operator, rest = self._name.split('-')
+            _, litvalue = rest.split('/')
+            if litvalue == 'lit8':
+                self._register = [instr.AA, instr.BB, instr.CC]
+            elif litvalue == 'lit16':
+                self._register = [instr.A, instr.B, instr.CCCC]
+            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
+                           str(self._register[1]) + " et la valeur entiere " + str(self._register[2]) + \
+                           " et le stocke dans " + str(self._register[0])
+
+        elif name[-5:] == '2addr': # exemple sub-int/2addr
+            operator, _ = self._name.split("-")
+            self._register = [instr.A, instr.B]
+            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
+                           str(self._register[0]) + " et v" + str(self._register[1]) + " et le stocke dans " + str(
+                self._register[0])
+
         elif name == 'return':
             self._register = [instr.AA]
             self._string = "instruction : " + name + " renvoie la valeur contenue dans le registre v" + str(
