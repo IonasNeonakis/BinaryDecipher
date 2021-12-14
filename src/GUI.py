@@ -13,6 +13,14 @@ class GUI():
         self._titleLabel = Label(self._root, text="BinaryDecipher")  # Titre
         self._subtitleLabel = Label(self._root, text="Par LegitIT")  # Sous titre
         self._browseLabel = Label(self._root, text="Choix du fichier APK")
+
+        self._img = PhotoImage(file="../logo/test1.png")
+        self._label = Label(
+            self._root,
+            image=self._img
+        )
+        self._label.place(x=0, y=0)
+
         self._titleLabel.pack()
         self._subtitleLabel.pack()
         self._browseLabel.pack()
