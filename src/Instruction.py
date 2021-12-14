@@ -9,8 +9,8 @@ class Instruction():
         if name == 'const-string':
             cm = instr.cm
             self._register = [instr.AA]
-            self._string = "instruction " + self._name + " enregistre dans v" + str(
-                self._register[0]) + " la valeur " + str(cm.get_string(instr.BBBB))
+            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} la valeur" \
+                           f"{cm.get_string(instr.BBBB)}"
         elif name[:6] == 'invoke':
             cm = instr.cm
             if instr.A == 0:
@@ -28,16 +28,15 @@ class Instruction():
             self._type = cm.get_type(instr.BBBB)
             self._field = None
             self._method = cm.get_method(instr.BBBB)
-            self._string = "instruction " + self._name + " appelle la methode : " + str(
-                self._method) + " et utilise les registres : "
+            self._string = f"instruction {self._name} appelle la methode : {self._method} et utilise les registres : "
             for i in range(len(self._register)):
-                self._string += " v" + str(self._register[i])
+                self._string += f" v{self._register[i]}"
         elif name[:4] == 'move':
             self._register = [instr.AA]
-            self._string = "instruction " + self._name + " déplace le resultat de l'invoke-kind le plus récent dans v" + str(
-                self._register[0])
+            self._string = f"instruction {self._name} déplace le résultat de l'invoke-kind le plus récent dans" \
+                           f"v{self._register[0]}"
         elif name == 'return-void':
-            self._string = "instruction : " + name + " ne fait rien (normal)"
+            self._string = f"instruction : {name} ne fait rien (normal)"
         elif name == 'const':
             try:
                 self._register = [instr.AA]
@@ -45,47 +44,43 @@ class Instruction():
             except:
                 self._register = [instr.A]
 
-            self._string = "instruction " + self._name + " enregistre dans v" + str(
-                str(self._register[0]) + " le/les litteraux suivant : " + str(instr.get_literals()))
+            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
+                           f" {instr.get_literals()}"
         elif name == 'check-cast':
             self._type = instr.cm.get_type(instr.BBBB)
-            self._string = "instruction " + name + " vérifie que la valeur du registre v" + str(
-                instr.AA) + " soit de type " + str(self._type)
-        elif name[:2] == 'if': # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
+            self._string = f"instruction {name} vérifie que la valeur du registre v{instr.AA} soit de type {self._type}"
+        elif name[:2] == 'if':  # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
             _, nom = name.split('-')
             if len(nom) == 2:
                 self._register = [instr.A, instr.B]
                 self._destination = instr.CCCC * 2
 
-            else: # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
+            else:  # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
                 self._register = [instr.AA]
                 self._destination = instr.BBBB * 2
-            self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(
-                self._register) + " en fonction du test specifier. Et si le test est valide renvoie à l'adresse : " + str(
-                self._destination) + " bits suivant"
+            self._string = f"instruction : {name} vérifie les valeurs de v : {self._register} en fonction du test" \
+                           f"specifié. Et si le test est valide renvoie à l'adresse : {self._destination} bits suivant"
         elif name == 'new-instance':
             self._type = instr.cm.get_type(instr.BBBB)
             self._register = [instr.AA]
-            self._string = "instruction : " + name + " crée une instance de type " + str(
-                self._type) + " et la stocke dans v" + str(self._register[0])
+            self._string = f"instruction : {name} crée une instance de type {self._type} et la stocke dans" \
+                           f"v{self._register[0]}"
         elif name == 'const-class':
             self._register = [instr.AA]
             self._type = instr.cm.get_type(instr.BBBB)
-            self._string = "instruction : " + name + " deplace l'instance de type " + str(
-                self._type) + " et la stocke dans v" + str(self._register[0])
+            self._string = f"instruction : {name} déplace l'instance de type {self._type} et la stocke dans" \
+                           f"v{self._register[0]}"
         elif name == 'const/4':
             self._register = [instr.A]
             self._value = instr.B
-            self._string = 'instruction : ' + name + ' met la valeur ' + str(self._value) + ' dans le registre ' + str(
-                self._register[0])
+            self._string = f"instruction : {name} met la valeur {self._value} dans le registre {self._register[0]}"
         elif name == 'const/16':
             self._register = [instr.AA]
             self._value = instr.BBBB
-            self._string = 'instruction : ' + name + ' met la valeur ' + str(self._value) + ' dans le registre ' + str(
-                self._register[0])
+            self._string = f"instruction : {name} met la valeur {self._value} dans le registre {self._register[0]}"
         elif name == 'goto':
             self._destination = instr.AA * 2
-            self._string = 'instruction : ' + name + " saute à l'offset " + str(self._destination)
+            self._string = f"instruction : {name} saute à l'offset {self._destination}"
         elif name in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                       'shr-int', 'ushr-int',
                       'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
@@ -93,9 +88,8 @@ class Instruction():
                       'rem-float', 'add-double', 'sub-double', 'mul-double', 'div-double', 'rem-double']:  # Binop
             operator, type = self._name.split("-")
             self._register = [instr.AA, instr.BB, instr.CC]
-            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
-                           str(self._register[1]) + " et v" + str(self._register[2]) + " et le stocke dans " + str(
-                self._register[0])
+            self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
+                           f"v{self._register[1]} et v{self._register[2]} et le stocke dans {self._register[0]}"
 
         elif name[-4:] == 'lit8' or name[-5:] == 'lit16':
             operator, rest = self._name.split('-')
@@ -104,21 +98,19 @@ class Instruction():
                 self._register = [instr.AA, instr.BB, instr.CC]
             elif litvalue == 'lit16':
                 self._register = [instr.A, instr.B, instr.CCCC]
-            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
-                           str(self._register[1]) + " et la valeur entiere " + str(self._register[2]) + \
-                           " et le stocke dans " + str(self._register[0])
+            self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
+                           f"v{self._register[1]} et la valeur entiere {self._register[2]} et le stocke dans" \
+                           f"{self._register[0]}"
 
-        elif name[-5:] == '2addr': # exemple sub-int/2addr
+        elif name[-5:] == '2addr':  # exemple sub-int/2addr
             operator, _ = self._name.split("-")
             self._register = [instr.A, instr.B]
-            self._string = "instruction : " + name + " execute l'opération " + operator + " entre les valeurs de v" + \
-                           str(self._register[0]) + " et v" + str(self._register[1]) + " et le stocke dans " + str(
-                self._register[0])
+            self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
+                           f"v{self._register[0]} et v{self._register[1]} et le stocke dans {self._register[0]}"
 
         elif name == 'return':
             self._register = [instr.AA]
-            self._string = "instruction : " + name + " renvoie la valeur contenue dans le registre v" + str(
-                self._register[0])
+            self._string = f"instruction : {name} renvoie la valeur contenue dans le registre v{self._register[0]}"
         else:
             self._string = None
 
