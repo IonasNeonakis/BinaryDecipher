@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 
 import androguard
 
@@ -10,38 +10,36 @@ from src.analyses import analyse_1
 class GUI():
     def __init__(self):
         self._root = Tk()  # Init de la fenetre principal
+        self._root.resizable(False, False);
+        frame = ttk.Frame(self._root, padding=(24, 24, 24, 24));
+        frame.grid(column=0, row=0, sticky=(N, S, E, W))
+        self._titleLabel = Label(frame, text="BinaryDecipher")  # Titre
+        self._subtitleLabel = Label(frame, text="Par LegitIT")  # Sous titre
+        self._titleLabel.grid(column=1, row=0, sticky=(N, S, E, W));
+        self._subtitleLabel.grid(column=1, row=1, sticky=(N, S, E, W));
 
-        # Les différentes sections
-        header = Frame(self._root).pack()
-        selection_APK = Frame(self._root).pack()
-        selection_class = Frame(self._root).pack()
-        selection_analyse = Frame(self._root).pack()
-
-        self._titleLabel = Label(header, text="BinaryDecipher")  # Titre
-        self._subtitleLabel = Label(header, text="Par LegitIT")  # Sous titre
-        self._titleLabel.pack()
-        self._subtitleLabel.pack()
-
-        self._browseLabel = Label(selection_APK, text="Choix du fichier APK")
-        self._browseLabel.pack()
+        self._browseLabel = Label(frame, text="Choix du fichier APK")
+        self._browseLabel.grid(column=0, row=2, sticky=(N, S, E, W));
         self._apkName = "En attente de l'APK"
-        Button(selection_APK, text="Parcourir", command=self.browse).pack()
-        self._apkNameLabel = Label(selection_APK, text=self._apkName)
-        self._apkNameLabel.pack()
+        self._apkNameLabel = Label(frame, text=self._apkName).grid(column=0, row=3, sticky=(N, S, E, W));
+        Button(frame, text="Parcourir", command=self.browse).grid(column=0, row=4, sticky=(N, S, E, W));
 
         self._liste_class = ["Choisir une APK d'abord"]
         self._default = StringVar()
         self._default.set(self._liste_class[0])
-        self._optionClass = OptionMenu(selection_class, self._default, *self._liste_class)
-        self._optionClass.pack()
+        self._optionClass = OptionMenu(frame, self._default, *self._liste_class)
+        self._optionClass.grid(column=1, row=2, sticky=(N, S, E, W));
 
         self._analyse = tkinter.IntVar()
-        Label(selection_analyse, text="Choix analyse").pack()
-        Radiobutton(selection_analyse, text='Analyse 1', variable=self._analyse, value=1).pack()
-        Radiobutton(selection_analyse, text='Analyse 2', variable=self._analyse, value=2).pack()
-        Radiobutton(selection_analyse, text='Analyse 3', variable=self._analyse, value=3).pack()
+        Label(frame, text="Choix analyse").grid(column=2, row=2, sticky=(N, S, E, W));
+        Radiobutton(frame, text='Analyse 1', variable=self._analyse, value=1).grid(column=2, row=3,
+                                                                                   sticky=(N, S, E, W));
+        Radiobutton(frame, text='Analyse 2', variable=self._analyse, value=2).grid(column=2, row=4,
+                                                                                   sticky=(N, S, E, W));
+        Radiobutton(frame, text='Analyse 3', variable=self._analyse, value=3).grid(column=2, row=5,
+                                                                                   sticky=(N, S, E, W));
 
-        Button(self._root, text="Analyser !", command=self.start_analyse).pack()
+        Button(frame, text="Analyser !", command=self.start_analyse).grid(column=2, row=6, sticky=(N, S, E, W));
 
         mainloop()
 
@@ -73,6 +71,7 @@ class GUI():
 
     def browse(self):
         self._apkName = filedialog.askopenfile(
+            initialdir='../apk/',
             title="Select a File",
             filetypes=(("APK",
                         "*.apk*"),
