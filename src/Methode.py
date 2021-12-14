@@ -69,6 +69,9 @@ class Methode():
             elif curr_instr.get_name() == "const":
                 tab = curr_instr.get_register()
                 self._etat_reg[tab[0]] = 'int'
+            elif curr_instr.get_name() == 'const/16':
+                tab = curr_instr.get_register()
+                self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                                            'shr-int', 'ushr-int']:
                 tab = curr_instr.get_register()
@@ -85,21 +88,34 @@ class Methode():
                 _, type = self._name.split("-")
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
-                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' \033[0m')
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' )\033[0m')
                 self._etat_reg[tab[0]] = type
 
             elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
                 tab = curr_instr.get_register()
-                if tab[1] != 'int' or tab[2] != 'int' :
-                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int  \033[0m')
+                if self._etat_reg[tab[1]] != 'int' or self._etat_reg[tab[2]] != 'int' :
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)  \033[0m')
 
                 self._etat_reg[tab[0]] = 'int'
 
             elif curr_instr.get_name()[-5:] == '2addr': # exemple :  sub-int/2addr
                 tab = curr_instr.get_register()
                 nom, type = curr_instr.get_name()[:-5].split('-')
-                if tab[0] != type or tab[1] != type:
-                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des '+ type +'\033[0m')
+                if self._etat_reg[tab[0]] != type or self._etat_reg[tab[1]] != type:
+                    print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des '+ type +')\033[0m')
+            elif curr_instr.get_name() == 'return-void':
+                pass
+            elif curr_instr.get_name()[:2] == 'if':
+                _, name = curr_instr.get_name().split('-')
+                if len(name) == 2 : # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
+                    if self._etat_reg[curr_instr.get_register()[0]] != 'int' or curr_instr.get_register()[1] != 'int':
+                        print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)\033[0m')
+                else: # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
+                    if self._etat_reg[curr_instr.get_register()[0]] != 'int':
+                        print('\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)\033[0m')
+
+
+
             else:
                 print('\033[91m' +curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
 

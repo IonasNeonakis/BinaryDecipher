@@ -51,12 +51,13 @@ class Instruction():
             self._type = instr.cm.get_type(instr.BBBB)
             self._string = "instruction " + name + " vérifie que la valeur du registre v" + str(
                 instr.AA) + " soit de type " + str(self._type)
-        elif name[:2] == 'if':
-            try:
+        elif name[:2] == 'if': # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
+            _, nom = name.split('-')
+            if len(nom) == 2:
                 self._register = [instr.A, instr.B]
                 self._destination = instr.CCCC * 2
 
-            except:
+            else: # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
                 self._register = [instr.AA]
                 self._destination = instr.BBBB * 2
             self._string = "instruction : " + name + " vérifie les valeurs de v : " + str(
@@ -75,6 +76,11 @@ class Instruction():
         elif name == 'const/4':
             self._register = [instr.A]
             self._value = instr.B
+            self._string = 'instruction : ' + name + ' met la valeur ' + str(self._value) + ' dans le registre ' + str(
+                self._register[0])
+        elif name == 'const/16':
+            self._register = [instr.AA]
+            self._value = instr.BBBB
             self._string = 'instruction : ' + name + ' met la valeur ' + str(self._value) + ' dans le registre ' + str(
                 self._register[0])
         elif name == 'goto':
