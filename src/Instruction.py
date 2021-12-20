@@ -1,6 +1,3 @@
-from androguard.core.bytecodes.dvm import Instruction23x
-
-
 class Instruction():
     def __init__(self, instr):
         name = instr.get_name()
@@ -34,7 +31,7 @@ class Instruction():
         elif name[:4] == 'move':
             self._register = [instr.AA]
             self._string = f"instruction {self._name} déplace le résultat de l'invoke-kind le plus récent dans" \
-                           f"v{self._register[0]}"
+                           f" v{self._register[0]}"
         elif name == 'return-void':
             self._string = f"instruction : {name} ne fait rien (normal)"
         elif name == 'const':
@@ -59,7 +56,7 @@ class Instruction():
                 self._register = [instr.AA]
                 self._destination = instr.BBBB * 2
             self._string = f"instruction : {name} vérifie les valeurs de v : {self._register} en fonction du test" \
-                           f"specifié. Et si le test est valide renvoie à l'adresse : {self._destination} bits suivant"
+                           f" specifié. Et si le test est valide renvoie à l'adresse : {self._destination} bits suivant"
         elif name == 'new-instance':
             self._type = instr.cm.get_type(instr.BBBB)
             self._register = [instr.AA]
@@ -89,7 +86,7 @@ class Instruction():
             operator, type = self._name.split("-")
             self._register = [instr.AA, instr.BB, instr.CC]
             self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
-                           f"v{self._register[1]} et v{self._register[2]} et le stocke dans {self._register[0]}"
+                           f" v{self._register[1]} et v{self._register[2]} et le stocke dans {self._register[0]}"
 
         elif name[-4:] == 'lit8' or name[-5:] == 'lit16':
             operator, rest = self._name.split('-')
@@ -99,14 +96,14 @@ class Instruction():
             elif litvalue == 'lit16':
                 self._register = [instr.A, instr.B, instr.CCCC]
             self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
-                           f"v{self._register[1]} et la valeur entiere {self._register[2]} et le stocke dans" \
+                           f" v{self._register[1]} et la valeur entiere {self._register[2]} et le stocke dans" \
                            f"{self._register[0]}"
 
         elif name[-5:] == '2addr':  # exemple sub-int/2addr
             operator, _ = self._name.split("-")
             self._register = [instr.A, instr.B]
             self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
-                           f"v{self._register[0]} et v{self._register[1]} et le stocke dans {self._register[0]}"
+                           f" v{self._register[0]} et v{self._register[1]} et le stocke dans {self._register[0]}"
 
         elif name == 'return':
             self._register = [instr.AA]
@@ -116,6 +113,12 @@ class Instruction():
 
     def __repr__(self):
         return self._string
+
+    def set_type(self, value):
+        self._type = value
+
+    def get_type(self):
+        return self._type
 
     def get_destination(self):
         return self._destination

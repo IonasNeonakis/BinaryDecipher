@@ -6,6 +6,7 @@ from src.Methode import Methode
 
 def analyse_1(apk_file, class_name):
     methode_rencontre = []  # On stockera les methodes de la classe
+    type_dernier_invoke = None  # Utilisé dans le cas où on rencontre un invoke (qui est suivi d'un move-result)
     apk_analisee = androguard.misc.AnalyzeAPK(apk_file)  # APK à analiser
     # main = "L" + class_name.replace(".", "/") + ";"  # Nom de la classe à traiter
     for classdef in apk_analisee[1]:  # Pour toutes les classes de l'APK
@@ -23,7 +24,13 @@ def analyse_1(apk_file, class_name):
                     if instr._string is None:  # Si ce type d'instruction n'est pas gérer
                         print('\033[91m' +
                               instruction.get_name() + " n'est pas prise en compte \033[0m")  # On l'affiche pour qu'on puisse l'ajouter
-
+                    elif instr.get_name()[:6] == "invoke":  # on doit stocker le type de l'invoke car il est suivi d'un move-result, qui mettera le résultat de l'invoke dans un registre
+                        type_dernier_invoke = instr.get_type()
+                        curr_method_instr.append(instr)
+                    elif instr.get_name()[:4] == "move":  # on récupère le type du dernier invoke et on le met dans le type de l'instruction
+                        instr.set_type(type_dernier_invoke)
+                        type_dernier_invoke = None
+                        curr_method_instr.append(instr)
                     else:
                         curr_method_instr.append(instr)  # Sinon on ajoute l'instruction a la liste
                 curr_method.set_instructions(
