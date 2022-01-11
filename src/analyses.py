@@ -4,10 +4,9 @@ from src.Instruction import Instruction
 from src.Methode import Methode
 
 
-def analyse_1(apk_file, class_name):
+def analyse_1(apk_analisee, class_name):
+    print(apk_analisee)
     methode_rencontre = []  # On stockera les methodes de la classe
-    apk_analisee = androguard.misc.AnalyzeAPK(apk_file)  # APK à analiser
-    # main = "L" + class_name.replace(".", "/") + ";"  # Nom de la classe à traiter
     for classdef in apk_analisee[1]:  # Pour toutes les classes de l'APK
         c = classdef.get_class(class_name)  # On get la classe avec le nom souhaité
         if c:  # Si on a quelque chose, alors c'est la bonne classe
