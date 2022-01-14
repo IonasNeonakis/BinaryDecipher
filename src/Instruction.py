@@ -3,6 +3,7 @@ class Instruction():
         name = instr.get_name()
         self._length = instr.get_length()
         self._name = name
+        self._constant = None
         if name == 'const-string':
             cm = instr.cm
             self._register = [instr.AA]
@@ -92,11 +93,13 @@ class Instruction():
             operator, rest = self._name.split('-')
             _, litvalue = rest.split('/')
             if litvalue == 'lit8':
-                self._register = [instr.AA, instr.BB, instr.CC]
+                self._register = [instr.AA, instr.BB]
+                self._constant = instr.CC
             elif litvalue == 'lit16':
-                self._register = [instr.A, instr.B, instr.CCCC]
+                self._register = [instr.A, instr.B]
+                self._constant = instr.CCCC
             self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
-                           f" v{self._register[1]} et la valeur entiere {self._register[2]} et le stocke dans" \
+                           f" v{self._register[1]} et la valeur entiere {self._constant} et le stocke dans" \
                            f"{self._register[0]}"
 
         elif name[-5:] == '2addr':  # exemple sub-int/2addr
