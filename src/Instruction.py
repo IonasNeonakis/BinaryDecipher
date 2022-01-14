@@ -78,7 +78,7 @@ class Instruction():
             self._string = f"instruction : {name} met la valeur {self._value} dans le registre {self._register[0]}"
         elif name == 'goto':
             self._destination = instr.AA * 2
-            self._string = f"instruction : {name} saute à l'offset {self._destination}"
+            self._string = f"instruction : {name} saute de {self._destination} offset"
         elif name in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                       'shr-int', 'ushr-int',
                       'add-long', 'sub-long', 'mul-long', 'div-long', 'rem-long', 'and-long', 'or-long', 'xor-long',
@@ -99,7 +99,7 @@ class Instruction():
                 self._register = [instr.A, instr.B]
                 self._constant = instr.CCCC
             self._string = f"instruction : {name} execute l'opération {operator} entre les valeurs de" \
-                           f" v{self._register[1]} et la valeur entiere {self._constant} et le stocke dans" \
+                           f" v{self._register[1]} et la valeur entiere {self._constant} et le stocke dans v" \
                            f"{self._register[0]}"
 
         elif name[-5:] == '2addr':  # exemple sub-int/2addr
@@ -122,6 +122,9 @@ class Instruction():
 
     def get_type(self):
         return self._type
+
+    def get_method(self):
+        return self._method
 
     def get_destination(self):
         return self._destination

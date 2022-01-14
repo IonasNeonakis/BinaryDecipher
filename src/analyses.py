@@ -10,7 +10,7 @@ def analyse_1(apk_analisee, class_name):
         c = classdef.get_class(class_name)  # On get la classe avec le nom souhaité
         if c:  # Si on a quelque chose, alors c'est la bonne classe
             for m in c.get_methods():  # Pour toutes ses méthodes
-                curr_method = Methode(m)  # On créer une instance de Methode
+                curr_method = Methode(m, class_name)  # On créer une instance de Methode
                 curr_method.set_informations(m.get_information())  # On set les informations de base
                 curr_method.set_name(m.get_name())
                 curr_method.set_nb_reg(m.get_information().get("registers")[1] + 1 + len(
@@ -34,7 +34,7 @@ def analyse_1(apk_analisee, class_name):
                     curr_method_instr)  # On set la liste des instructions dans l'attribut de l'instance de la méthode
                 methode_rencontre.append(
                     curr_method)  # On ajoute la methode instanciée à la liste des méthodes de la classe
-            for methode in methode_rencontre:  # Pour chacunes des méthodes de la classe
+            for methode in methode_rencontre[1:]:  # Pour chacunes des méthodes de la classe
                 methode.get_androguard_method().show()
                 methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
                 print(methode.get_succ())

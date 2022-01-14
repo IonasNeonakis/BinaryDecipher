@@ -1,5 +1,5 @@
 class Methode():
-    def __init__(self, method):
+    def __init__(self, method, class_name):
         self._nb_reg = None
         self._androguard_method = method
         self._informations = None
@@ -7,6 +7,8 @@ class Methode():
         self._succ = {}
         self._etat_reg = {}
         self._name = None
+        self._isStatic = 'static' in method.get_access_flags_string()
+        self._class_name = class_name
 
     def set_name(self, name):
         self._name = name
@@ -46,7 +48,9 @@ class Methode():
             elif instr.get_name()[:2] == "if":
                 destination = [offset + instr.get_destination(), offset + instr.get_length()]
             elif "goto" in instr.get_name():
-                destination.append(instr.get_destination())
+                destination.append(instr.get_destination()+offset)
+            elif "return" in instr.get_name():
+                destination = []
             else:
                 destination.append(
                     offset + instr.get_length())  # Juste l'instruction d'après (car c'est une instruction sequentiel
@@ -65,12 +69,23 @@ class Methode():
         for num_reg, type in params:
             self._etat_reg[
                 num_reg] = type  # Initialisation des types des registres en fonction des parametres de la methode
+        if not self._isStatic:
+            self._etat_reg[self._informations['registers'][1]] = self._class_name
         while len(to_do) > 0:
             curr_instr, destination, offset = to_do[0]
             parents = self.get_parents_instruction(offset)
             print(curr_instr)
-            if curr_instr.get_name()[:6] == "invoke":  # TODO supprimer si on ne l'utilise pas
-                pass  # On n'attribut aucun type aux registre donc pas de changement
+            if curr_instr.get_name()[:6] == "invoke":
+                m = curr_instr.get_method()
+                if self._isStatic:
+                    pass #Todo
+                else:
+                    contextBon = self._class_name == m[0]
+                    #iteré sur les parametres de la method m[2][1] et vérifier l'égalité des types avec curr_method.get_register() correspondant (en ignorant le premier car c'est le contexte)
+                    pass #Todo
+                #For each params passed to the method
+                    #Check if type are correct with m[2][0]
+                #Stocker le type de retour (pour le prochain move result) m[2][1]
             elif curr_instr.get_name() == "return":
                 if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[
                     0]]:  # Si le type du registre renvoyé n'est pas égal au type de retour de la méthode
@@ -80,7 +95,7 @@ class Methode():
                 self._etat_reg[curr_instr.get_register()[0]] = 'string'
             elif curr_instr.get_name() == "const":  # Todo : fusionner les deux const?
                 self._etat_reg[curr_instr.get_register()[0]] = 'int'
-            elif curr_instr.get_name() == 'const/16':
+            elif curr_instr.get_name() == 'const/16' or curr_instr.get_name() == 'const/4':
                 self._etat_reg[curr_instr.get_register()[0]] = 'int'
             elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                                            'shr-int', 'ushr-int']:
@@ -127,10 +142,12 @@ class Methode():
                         print(
                             '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)\033[0m')
                 else:  # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
-                    if self._etat_reg[curr_instr.get_register()[0]] != 'None':
+                    if self._etat_reg[curr_instr.get_register()[0]] == 'None':
                         print(
                             '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)\033[0m')
                         return False
+            elif curr_instr.get_name() == 'goto':
+                pass
             else:
                 print(
                     '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
@@ -138,7 +155,7 @@ class Methode():
             to_do.pop(0)
             for child in destination:
                 to_do.append(self._succ.get(child))
-            print("Fin d'analyse : methode valide")
+        print("Fin d'analyse : methode valide")
         return is_valide
 
     def get_androguard_method(self):
