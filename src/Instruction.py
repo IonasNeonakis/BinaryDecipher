@@ -10,6 +10,7 @@ class Instruction:
         self._method = None  # Contient la méthode utilisé par l'instruction
         self._string = None  # Le str pour print une desc de l'instruction
         self._destination = None  # Destination d'une instruction (dans le cadre d'un branchement)
+        self._field = None  # Path vers un ressource (path vers une fonction comme println par exemple)
 
         if self._name == 'const-string':
             # const-string vAA, string@BBBB
@@ -201,6 +202,29 @@ class Instruction:
             # A: return value register (8 bits)
             self._register.append(instr.AA)
             self._string = f"instruction : {self._name} renvoie la valeur contenue dans le registre v{self._register[0]}"
+
+        elif self._name[:4] in ['sget', 'sput']:
+            # sstaticop vAA, field@BBBB
+            # 60: sget
+            # 61: sget-wide
+            # 62: sget-object
+            # 63: sget-boolean
+            # 64: sget-byte
+            # 65: sget-char
+            # 66: sget-short
+            # 67: sput
+            # 68: sput-wide
+            # 69: sput-object
+            # 6a: sput-boolean
+            # 6b: sput-byte
+            # 6c: sput-char
+            # 6d: sput-short
+            # A: value register or pair; may be source or dest (8 bits)
+            # B: static field reference index (16 bits)
+            self._register.append(instr.AA)
+            self._field = instr.cm.get_field(instr.BBBB)
+            self._string = f"instruction : {self._name} stock le champs {self._field} dans v{self._register[0]}"
+
         else:
             self._string = None
 
@@ -236,3 +260,6 @@ class Instruction:
 
     def get_destination(self):
         return self._destination
+
+    def get_field(self):
+        return self._field

@@ -34,7 +34,7 @@ def analyse_1(apk_analisee, class_name):
                     curr_method_instr)  # On set la liste des instructions dans l'attribut de l'instance de la méthode
                 methode_rencontre.append(
                     curr_method)  # On ajoute la methode instanciée à la liste des méthodes de la classe
-            for methode in methode_rencontre[1:]:  # Pour chacunes des méthodes de la classe
+            for methode in methode_rencontre:  # Pour chacunes des méthodes de la classe
                 methode.get_androguard_method().show()
                 methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
                 print(methode.get_succ())

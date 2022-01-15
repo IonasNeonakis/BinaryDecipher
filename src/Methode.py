@@ -9,6 +9,10 @@ class Methode():
         self._name = None
         self._isStatic = 'static' in method.get_access_flags_string()
         self._class_name = class_name
+        self._dalvik_to_primitive = {'V': 'void', 'B': 'byte', 'C': 'char', 'J': 'long', 'D': 'double', 'Z': 'boolean',
+                                     'S': 'short', 'I': 'int', 'F': 'float'}
+        self._primitive_to_dalvik = {'void': 'V', 'byte': 'B', 'char': 'C', 'long': 'J', 'double': 'D', 'boolean': 'Z',
+                                     'short': 'S', 'int': 'I', 'float': 'F'}
 
     def set_name(self, name):
         self._name = name
@@ -57,6 +61,19 @@ class Methode():
             self._succ[offset] = (instr, destination, offset)
             offset += instr.get_length()  # Mise à jour de l'offset (adresse de l'instruction suivante
 
+    def get_method_params(self, m):
+        # Renvoie la liste des params de la méthode appellé dans un invoke
+        res = {}
+        res['entry'] = []
+        entry_params, exit_type = m[2]
+        print("param ", entry_params, " ", exit_type)
+        res['exit'] = self._dalvik_to_primitive.get(exit_type)
+        entry_params = entry_params.replace("(", "").replace(")", "")
+        entry_params = list(entry_params.split(" "))
+        for param in entry_params:
+            res['entry'].append(self._dalvik_to_primitive.get(param, param))
+        return res
+
     def evaluate(self):
         print("\n")
         print("=" * 20)
@@ -67,8 +84,10 @@ class Methode():
         params = self._informations.get('params', [])
         print(self._informations)
         for num_reg, type in params:
-            self._etat_reg[
-                num_reg] = type  # Initialisation des types des registres en fonction des parametres de la methode
+            # Initialisation des types des registres en fonction des parametres de la methode
+            if type not in self._primitive_to_dalvik.keys():
+                type = 'L'+type.replace(".", "/")+";"
+            self._etat_reg[num_reg] = type
         if not self._isStatic:
             self._etat_reg[self._informations['registers'][1]] = self._class_name
         while len(to_do) > 0:
@@ -80,21 +99,28 @@ class Methode():
                 if self._isStatic:
                     pass  # Todo
                 else:
-                    contextBon = self._class_name == m[0]
-                    # iteré sur les parametres de la method m[2][1] et vérifier l'égalité des types avec curr_method.get_register() correspondant (en ignorant le premier car c'est le contexte)
-                    pass  # Todo
-                # For each params passed to the method
-                # Check if type are correct with m[2][0]
-                # Stocker le type de retour (pour le prochain move result) m[2][1]
+                    if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
+                        print(
+                            '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
+                    method_params = self.get_method_params(m)
+                    for i in range(1, len(curr_instr.get_register())):
+                        if self._etat_reg.get(curr_instr.get_register()[i]) != method_params.get('entry')[i-1]:
+                            print(
+                                '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
+                                str(curr_instr.get_register()[
+                                    i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
+
             elif curr_instr.get_name() == "return":
-                if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[
-                    0]]:  # Si le type du registre renvoyé n'est pas égal au type de retour de la méthode
+                if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]]:
                     print("Erreur de type de retour")
                     return False
             elif curr_instr.get_name() == "move-result":
-                pass #Todo
+                last_exit = method_params.get('exit', None)
+                self._etat_reg[curr_instr.get_register()[0]] = last_exit
+            elif curr_instr.get_name()[:4] in ['sget', 'sput']:
+                self._etat_reg[curr_instr.get_register()[0]] = curr_instr.get_field()
             elif curr_instr.get_name() == "const-string":
-                self._etat_reg[curr_instr.get_register()[0]] = 'string'
+                self._etat_reg[curr_instr.get_register()[0]] = 'Ljava/lang/String;'
             elif curr_instr.get_name() == "const":  # Todo : fusionner les deux const?
                 self._etat_reg[curr_instr.get_register()[0]] = 'int'
             elif curr_instr.get_name() == 'const/16' or curr_instr.get_name() == 'const/4':
@@ -111,7 +137,7 @@ class Methode():
                                            'shl-long', 'shr-long', 'ushr-long', 'add-float', 'sub-float', 'mul-float',
                                            'div-float', 'rem-float', 'add-double', 'sub-double', 'mul-double',
                                            'div-double', 'rem-double']:  # Binop
-                _, type = self._name.split("-")
+                _, type = curr_instr.get_name().split("-")
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
                     print(
@@ -127,11 +153,11 @@ class Methode():
                 self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name()[-5:] == '2addr':  # exemple :  sub-int/2addr
                 tab = curr_instr.get_register()
-                nom, type = curr_instr.get_name()[:-5].split('-')
+                nom, type = curr_instr.get_name()[:-6].split('-')
                 if self._etat_reg[tab[0]] != type or self._etat_reg[tab[1]] != type:
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ')\033[0m')
-                    return False
+                    # return False
                 # v0 ne change pas de type
             elif curr_instr.get_name() == 'return-void':
                 if not self._informations['return'] == 'void':
@@ -147,7 +173,7 @@ class Methode():
                     if self._etat_reg[curr_instr.get_register()[0]] == 'None':
                         print(
                             '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)\033[0m')
-                        return False
+                        # return False
             elif curr_instr.get_name() == 'goto':
                 pass
             else:
