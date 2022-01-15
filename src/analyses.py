@@ -22,11 +22,11 @@ def analyse_1(apk_analisee, class_name):
                         print('\033[91m' +
                               instruction.get_name() + " n'est pas prise en compte \033[0m")  # On l'affiche pour qu'on puisse l'ajouter
                     elif instr.get_name()[:6] == "invoke":  # on doit stocker le type de l'invoke car il est suivi d'un move-result, qui mettera le résultat de l'invoke dans un registre
-                        type_dernier_invoke = instr.get_type()
+                        # type_dernier_invoke = instr.get_type()
                         curr_method_instr.append(instr)
                     elif instr.get_name()[:4] == "move":  # on récupère le type du dernier invoke et on le met dans le type de l'instruction
-                        instr.set_type(type_dernier_invoke)
-                        type_dernier_invoke = None
+                        # instr.set_type(type_dernier_invoke)
+                        # type_dernier_invoke = None
                         curr_method_instr.append(instr)
                     else:
                         curr_method_instr.append(instr)  # Sinon on ajoute l'instruction a la liste

@@ -48,7 +48,7 @@ class Methode():
             elif instr.get_name()[:2] == "if":
                 destination = [offset + instr.get_destination(), offset + instr.get_length()]
             elif "goto" in instr.get_name():
-                destination.append(instr.get_destination()+offset)
+                destination.append(instr.get_destination() + offset)
             elif "return" in instr.get_name():
                 destination = []
             else:
@@ -78,19 +78,21 @@ class Methode():
             if curr_instr.get_name()[:6] == "invoke":
                 m = curr_instr.get_method()
                 if self._isStatic:
-                    pass #Todo
+                    pass  # Todo
                 else:
                     contextBon = self._class_name == m[0]
-                    #iteré sur les parametres de la method m[2][1] et vérifier l'égalité des types avec curr_method.get_register() correspondant (en ignorant le premier car c'est le contexte)
-                    pass #Todo
-                #For each params passed to the method
-                    #Check if type are correct with m[2][0]
-                #Stocker le type de retour (pour le prochain move result) m[2][1]
+                    # iteré sur les parametres de la method m[2][1] et vérifier l'égalité des types avec curr_method.get_register() correspondant (en ignorant le premier car c'est le contexte)
+                    pass  # Todo
+                # For each params passed to the method
+                # Check if type are correct with m[2][0]
+                # Stocker le type de retour (pour le prochain move result) m[2][1]
             elif curr_instr.get_name() == "return":
                 if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[
                     0]]:  # Si le type du registre renvoyé n'est pas égal au type de retour de la méthode
                     print("Erreur de type de retour")
                     return False
+            elif curr_instr.get_name() == "move-result":
+                pass #Todo
             elif curr_instr.get_name() == "const-string":
                 self._etat_reg[curr_instr.get_register()[0]] = 'string'
             elif curr_instr.get_name() == "const":  # Todo : fusionner les deux const?
