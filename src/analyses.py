@@ -15,7 +15,7 @@ def analyse_1(apk_analisee, class_name):
             else:
                 classe_parent = c.get_superclassname()  # La classe actuelle "extends" une autre classe
             for m in c.get_methods():  # Pour toutes ses méthodes
-                curr_method = Methode(m, class_name)  # On créer une instance de Methode
+                curr_method = Methode(m, class_name, classe_parent)  # On créer une instance de Methode
                 curr_method.set_informations(m.get_information())  # On set les informations de base
                 curr_method.set_name(m.get_name())
                 curr_method.set_nb_reg(m.get_information().get("registers")[1] + 1 + len(

@@ -1,5 +1,5 @@
 class Methode():
-    def __init__(self, method, class_name):
+    def __init__(self, method, class_name, parent_class_name):
         self._nb_reg = None
         self._androguard_method = method
         self._informations = None
@@ -13,6 +13,7 @@ class Methode():
                                      'S': 'short', 'I': 'int', 'F': 'float'}
         self._primitive_to_dalvik = {'void': 'V', 'byte': 'B', 'char': 'C', 'long': 'J', 'double': 'D', 'boolean': 'Z',
                                      'short': 'S', 'int': 'I', 'float': 'F'}
+        self._parent_class_name = parent_class_name
 
     def set_name(self, name):
         self._name = name
@@ -174,6 +175,10 @@ class Methode():
                             print(
                                 '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)\033[0m')
                             # return False
+                elif curr_instr.get_name() == "new-instance":   # todo : continuer ici
+                    print(f"new-instance : le type est {curr_instr.get_type()}, alors heureux ?")
+                    # TODO : récupérer la superclass du type (faire en sorte que c'est possible)
+                    pass
                 elif curr_instr.get_name() == 'goto':
                     pass
                 else:
@@ -193,6 +198,12 @@ class Methode():
             if registre not in self._etat_reg.keys():
                 return False
         return True
+
+    # méthode qui vérifie si un objet peut être stocké dans un registre en fonction de sa classe parent
+    # ex : on a un objet B qui hérite de A, et le registre est de type A. On peut y stocker du A et du B
+    def check_super_class(self, registre_destination, type):
+        type_registre_destination = self._etat_reg[registre_destination]
+
 
     def get_androguard_method(self):
         return self._androguard_method
