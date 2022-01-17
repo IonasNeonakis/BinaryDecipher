@@ -101,7 +101,11 @@ class Methode():
                     if self._isStatic:
                         pass  # Todo
                     else:
-                        if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
+                        print("m", m)
+                        print("self machin", self._etat_reg.get(curr_instr.get_register()[0]))
+                        if self._etat_reg.get(curr_instr.get_register()[0]) is None:  # todo corriger
+                            print("\033[91mPrévention d'erreur bizarre basée sur le fait que le registre est égal à none et qu'on veuille le parcourir\033[0m")
+                        elif m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
                             print(
                                 '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
                         method_params = self.get_method_params(m)
@@ -177,7 +181,7 @@ class Methode():
                             # return False
                 elif curr_instr.get_name() == "new-instance":   # todo : continuer ici
                     print(f"new-instance : le type est {curr_instr.get_type()}, alors heureux ?")
-                    # TODO : récupérer la superclass du type (faire en sorte que c'est possible)
+                    # TODO : récupérer la superclass du type (faire en sorte que ce soit possible)
                     pass
                 elif curr_instr.get_name() == 'goto':
                     pass
