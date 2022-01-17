@@ -7,5 +7,5 @@ class Communications:
         permissions = a.get_permissions()
         print("PERMISSIONS DEMANDÉES : ", permissions)
 
-        declared_permissions = a.declared_permissions()
+        declared_permissions = a.declared_permissions
         print("PERMISSIONS DECLARÉES : ", declared_permissions)

@@ -88,7 +88,7 @@ class GUI():
         print("analyse : " + str(self.varGr.get()))
         if str(self.varGr.get()) == '1':
             #print("start analyse 1")
-            #analyse_1(self.apk_analisee, self._default.get())
+            analyse_1(self.apk_analisee, self._default.get())
 
             print("start communications")
             com = Communications(self.apk_analisee)
