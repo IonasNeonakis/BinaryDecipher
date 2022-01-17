@@ -9,6 +9,11 @@ def analyse_1(apk_analisee, class_name):
     for classdef in apk_analisee[1]:  # Pour toutes les classes de l'APK
         c = classdef.get_class(class_name)  # On get la classe avec le nom souhaité
         if c:  # Si on a quelque chose, alors c'est la bonne classe
+            if c.get_superclassname() == "Ljava/lang/Object;":  # vérification de la super classe de la classe actuelle
+                # si la classe parent est Object c'est que c'est une classe de base
+                classe_parent = None  # La classe actuelle n'"extends" pas une autre classe intéressante
+            else:
+                classe_parent = c.get_superclassname()  # La classe actuelle "extends" une autre classe
             for m in c.get_methods():  # Pour toutes ses méthodes
                 curr_method = Methode(m, class_name)  # On créer une instance de Methode
                 curr_method.set_informations(m.get_information())  # On set les informations de base
