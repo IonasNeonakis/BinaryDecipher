@@ -66,7 +66,6 @@ class Methode():
         res = {}
         res['entry'] = []
         entry_params, exit_type = m[2]
-        print("param ", entry_params, " ", exit_type)
         res['exit'] = self._dalvik_to_primitive.get(exit_type)
         entry_params = entry_params.replace("(", "").replace(")", "")
         entry_params = list(entry_params.split(" "))
@@ -74,46 +73,49 @@ class Methode():
             res['entry'].append(self._dalvik_to_primitive.get(param, param))
         return res
 
-    def evaluate(self):
-        print("\n")
-        print("=" * 20)
-        print("Début de l'analyse : Méthode " + self._name + "\n")
+    def evaluate(self, f):
+        str_rapport = f"\nTraitement de la méthode {self._name}\n"
         offset = 0  # Début
         to_do = [self._succ.get(offset)]
         is_valide = True
         params = self._informations.get('params', [])
-        print(self._informations)
         for num_reg, type in params:
             # Initialisation des types des registres en fonction des parametres de la methode
             if type not in self._primitive_to_dalvik.keys():
-                type = 'L'+type.replace(".", "/")+";"
+                type = 'L' + type.replace(".", "/") + ";"
             self._etat_reg[num_reg] = type
         if not self._isStatic:
             self._etat_reg[self._informations['registers'][1]] = self._class_name
         while len(to_do) > 0:
             curr_instr, destination, offset = to_do[0]
             parents = self.get_parents_instruction(offset)
-            print(curr_instr)
             if curr_instr.get_name()[:6] == "invoke":
                 m = curr_instr.get_method()
                 if self._isStatic:
                     pass  # Todo
                 else:
-                    if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
+                    if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]) and m[0] != 'Ljava/lang/Object;':
                         print(
                             '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
+                        str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Erreur de registre, le valeur attendu est {m[0]} mais on donne {self._etat_reg.get(curr_instr.get_register()[0])}"
+                        is_valide = False
                     method_params = self.get_method_params(m)
                     for i in range(1, len(curr_instr.get_register())):
-                        if self._etat_reg.get(curr_instr.get_register()[i]) != method_params.get('entry')[i-1]:
+                        if self._etat_reg.get(curr_instr.get_register()[i]) != method_params.get('entry')[i - 1]:
                             print(
                                 '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
                                 str(curr_instr.get_register()[
-                                    i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
-
+                                        i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
+                            is_valide = False
+                            str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Les paramètres" \
+                                           f" donnés n'ont pas le bon type"
             elif curr_instr.get_name() == "return":
                 if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]]:
                     print("Erreur de type de retour")
-                    return False
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Le type" \
+                                   f" de {self._etat_reg[curr_instr.get_register()[0]]} ne correspond pas au type de" \
+                                   f" retour de la méthode ({self._informations['return']})"
             elif curr_instr.get_name() == "move-result":
                 last_exit = method_params.get('exit', None)
                 self._etat_reg[curr_instr.get_register()[0]] = last_exit
@@ -129,6 +131,9 @@ class Methode():
                                            'shr-int', 'ushr-int']:
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != 'int' or self._etat_reg[tab[2]] != 'int':
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Les deux éléments " \
+                                   f"ne sont pas des ints : {self._etat_reg[tab[1]]} & {self._etat_reg[tab[2]]}"
                     print('Erreur dans les registres, ce ne sont pas des int')
                 self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int',
@@ -142,14 +147,18 @@ class Methode():
                 if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' )\033[0m')
-                    return False
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Les deux " \
+                                   f"éléments ne sont pas des {type}  : {self._etat_reg[tab[1]]} & {self._etat_reg[tab[2]]}"
                 self._etat_reg[tab[0]] = type
             elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != 'int':
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)  \033[0m')
-                    return False
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : L'element n'est " \
+                                   f"pas un int : {self._etat_reg[tab[1]]} "
                 self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name()[-5:] == '2addr':  # exemple :  sub-int/2addr
                 tab = curr_instr.get_register()
@@ -157,34 +166,47 @@ class Methode():
                 if self._etat_reg[tab[0]] != type or self._etat_reg[tab[1]] != type:
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ')\033[0m')
-                    # return False
-                # v0 ne change pas de type
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : l'element" \
+                                   f" n'est pas du bon type : {self._etat_reg[tab[0]]} required int"
+                    # v0 ne change pas de type
             elif curr_instr.get_name() == 'return-void':
                 if not self._informations['return'] == 'void':
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type de retour ne correspond pas.)\033[0m')
+                    is_valide = False
+                    str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : Le type de retour de la methode n'est pas void mais {self._informations['return']}"
             elif curr_instr.get_name()[:2] == 'if':
                 _, name = curr_instr.get_name().split('-')
                 if len(name) == 2:  # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
                     if self._etat_reg[curr_instr.get_register()[0]] != self._etat_reg[curr_instr.get_register()[1]]:
                         print(
                             '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)\033[0m')
+                        is_valide = False
+                        str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : test d'égalité sur des types différents"
+
                 else:  # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
                     if self._etat_reg[curr_instr.get_register()[0]] == 'None':
                         print(
                             '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)\033[0m')
-                        # return False
+                        is_valide = False
+                        str_rapport += f"\nErreur dans l'instruction {curr_instr.get_name()} : test d'égalité sur un None et 0"
             elif curr_instr.get_name() == 'goto':
                 pass
             else:
                 print(
                     '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
-
+                is_valide = False
+                str_rapport += f"\nErreur : l'instruction {curr_instr.get_name()} n'est pas encore gérer dans methode.py"
             to_do.pop(0)
             for child in destination:
                 to_do.append(self._succ.get(child))
-        print("Fin d'analyse : methode valide")
-        return is_valide
+        if is_valide:
+            return is_valide
+        else:
+            f.write(str_rapport)
+            f.close()
+            return is_valide
 
     def get_androguard_method(self):
         return self._androguard_method

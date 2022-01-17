@@ -1,0 +1,5 @@
+Analyse de la classe Lcom/example/fiboapksan/EmptyActivity;
+
+Traitement de la méthode <init>
+
+Erreur dans l'instruction invoke-direct : Erreur de registre, le valeur attendu est Landroidx/appcompat/app/AppCompatActivity; mais on donne Lcom/example/fiboapksan/EmptyActivity;
