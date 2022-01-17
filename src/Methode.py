@@ -1,4 +1,4 @@
-class Methode():
+class Methode:
     def __init__(self, method, class_name):
         self._nb_reg = None
         self._androguard_method = method
