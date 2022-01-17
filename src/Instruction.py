@@ -21,6 +21,26 @@ class Instruction:
             self._string = f"instruction {self._name} enregistre dans v{self._register[0]} la valeur" \
                            f"{self._string_value}"
 
+        elif self._name in ['move', 'move/from16', 'move/16']:
+            if self._name == 'move':
+                # move vA, vB
+                # A: destination register (4 bits)
+                # B: source register (4 bits)
+                self._register.extend([instr.A, instr.B])
+
+            elif self._name == 'move/from16':
+                # move/from16 vAA, vBBBB
+                # A: destination register (8 bits)
+                # B: source register (16 bits)
+                self._register.extend([instr.AA, instr.BBBB])
+
+            elif self._name == 'move/16':
+                # move/16 vAAAA, vBBBB
+                # A: destination register (16 bits)
+                # B: source register (16 bits)
+                self._register.extend([instr.AAAA, instr.BBBB])
+            self._string = f"instruction {self._name} déplace dans v{self._register[0]} l'element de v{self._register[1]}"
+
         elif self._name[:6] == 'invoke':
             # invoke-kind {vC, vD, vE, vF, vG}, meth@BBBB
             # A: argument word count (4 bits)
