@@ -222,8 +222,17 @@ class Instruction:
             self._destination = instr.BBBBBBBB * 2
             self._string = f"instruction {self._name} rempli l'array de v{self._register[0]} avec le" \
                            f" payload situé a +{self._destination} offset"
+
         elif self._name == "fill-array-data-payload":
-            self._constant = instr.data
+            test = []
+            for i in range(instr.size):
+                b = b''
+                for j in range(instr.element_width):
+                    b += int.to_bytes(instr.data[i * instr.element_width + j], 1, 'big')
+                test.append(int.from_bytes(b, byteorder='little'))
+                i += instr.element_width
+            self._constant = test
+            self._string = f"instruction {self._name} contient un payload  : {self._constant}"
 
         elif self._name == 'throw':
             # throw vAA
@@ -525,6 +534,9 @@ class Instruction:
             self._register.append(instr.AA)
             self._prototype = instr.cm.get_proto(instr.BBBB)
             self._string = f"instruction {self._name} stock dans v{self._register[0]} une référence du prototype de methode : {self._prototype}"
+
+        elif self._name == "nop":
+            self._string = f"instruction {self._name} fait rien ??"
 
         else:
             self._string = None

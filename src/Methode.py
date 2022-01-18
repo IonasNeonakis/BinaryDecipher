@@ -1,3 +1,6 @@
+import copy
+
+
 class Methode():
     def __init__(self, method, class_name):
         self._nb_reg = None
@@ -174,8 +177,8 @@ class Methode():
                             last_move = (method_params.get('exit'), None)
 
                 elif curr_instr.get_name()[:4] in ["aget", "aput"]:
-                    if curr_instr.get_name() in  ["aget", "aput"]:
-                        pass
+                    if curr_instr.get_name() in ["aget", "aput"]:
+                        self._etat_reg[curr_instr.get_register()[0]] = ('int', self._etat_reg[curr_instr.get_register()[1]][1][self._etat_reg[curr_instr.get_register()[2]][1]])
                     else:
                         op, type = curr_instr.get_name().split('-')
                         if type == "wide":
@@ -234,21 +237,28 @@ class Methode():
                             # return False
                 elif curr_instr.get_name() == 'goto':
                     pass
-                else:
-                    print(
-                        '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
 
-            elif curr_instr.get_name() == "fill-new-array":
-                offset_payload = curr_instr.get_destination() + curr_instr.get_length()
-                data = self._succ.get(offset_payload).get_constant()
+                elif curr_instr.get_name() == "new-array":
+                    if self._etat_reg.get(curr_instr.get_register()[1])[0] != 'int': # pour la taille
+                        print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                        is_valide = False
+                    else:
+                        self._etat_reg[curr_instr.get_register()[0]] = (curr_instr.get_type(), [])
+
+                elif curr_instr.get_name() == "fill-array-data":
+                    offset_payload = curr_instr.get_destination() + curr_instr.get_length()
+                    data = self._succ.get(offset_payload + offset - curr_instr.get_length())[0].get_constant()
+                    self._etat_reg[curr_instr.get_register()[0]] = (self._etat_reg[curr_instr.get_register()[0]][0], data)
+                    #Todo check type
+                else:
+                    print('\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
 
             else:
                 print(f"\033[91mErreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)\033[0m")
-            tmp_map_register[offset] = self._etat_reg
+            tmp_map_register[offset] = copy.deepcopy(self._etat_reg) #Fixme
             to_do.pop(0)
             for child in destination:
                 to_do.insert(0, self._succ.get(child))
-        print(tmp_map_register)
         return is_valide
 
     # méthode qui vérifie que les registres demandés par l'instruction sont bien accessibles dans le code
