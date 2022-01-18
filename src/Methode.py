@@ -237,6 +237,13 @@ class Methode():
         print(tmp_map_register)
         return is_valide
 
+    # méthode qui vérifie que les registres demandés par l'instruction sont bien accessibles dans le code
+    def check_registers_accessibility(self, registres_methode):
+        for registre in registres_methode:
+            if registre not in self._etat_reg.keys():
+                return False
+        return True
+
     def get_androguard_method(self):
         return self._androguard_method
 
