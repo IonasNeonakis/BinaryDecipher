@@ -218,7 +218,12 @@ class Instruction:
             # fill-array-data vAA, +BBBBBBBB (with supplemental data as specified below in "fill-array-data-payload Format")
             # A: array reference (8 bits)
             # B: signed "branch" offset to table data pseudo-instruction (32 bits)
-            pass  # Todo
+            self._register.append(instr.AA)
+            self._destination = instr.BBBBBBBB * 2
+            self._string = f"instruction {self._name} rempli l'array de v{self._register[0]} avec le" \
+                           f" payload situé a +{self._destination} offset"
+        elif self._name == "fill-array-data-payload":
+            self._constant = instr.data
 
         elif self._name == 'throw':
             # throw vAA

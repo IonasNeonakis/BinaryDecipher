@@ -110,7 +110,6 @@ class Methode():
                                 is_valide = False
 
             if self.check_registers_accessibility(curr_instr.get_register()):
-
                 if curr_instr.get_name()[:4] == "move":
                     if curr_instr.get_name() in ['move', 'move-wide', 'move-object', 'move/from16', 'move-wide/from16', 'move-object/from16', 'move/16', 'move-wide/16', 'move-object/16']:
                         if 'wide' in curr_instr.get_name():
@@ -151,7 +150,6 @@ class Methode():
                 elif 'const-string' in curr_instr.get_name():
                     self._etat_reg[curr_instr.get_register()[0]] = ('Ljava/lang/String;', curr_instr.get_string())
 
-
                 elif curr_instr.get_name() == 'const-class':
                     self._etat_reg[curr_instr.get_register()[0]] = (curr_instr.get_type(), None)
 
@@ -160,23 +158,31 @@ class Methode():
                         print("Erreur de type de retour")
                         is_valide = False
 
-                elif curr_instr.get_name()[:6] == "invoke":
+                elif curr_instr.get_name()[:6] == "invoke" and 'custom' not in curr_instr.get_name() and 'polymorphic' not in curr_instr.get_name():
                     m = curr_instr.get_method()
-                    if self._isStatic:
-                        pass  # Todo
-                    else:
-                        if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
+                    if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
+                        print(
+                            '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
+                    method_params = self.get_method_params(m)
+                    for i in range(1, len(curr_instr.get_register())):
+                        if self._etat_reg.get(curr_instr.get_register()[i])[0] != method_params.get('entry')[i-1]:
                             print(
-                                '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
-                        method_params = self.get_method_params(m)
-                        for i in range(1, len(curr_instr.get_register())):
-                            if self._etat_reg.get(curr_instr.get_register()[i])[0] != method_params.get('entry')[i-1]:
-                                print(
-                                    '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
-                                    str(curr_instr.get_register()[
-                                        i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
-                            else:
-                                last_move = (method_params.get('exit'), None)
+                                '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
+                                str(curr_instr.get_register()[
+                                    i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
+                        else:
+                            last_move = (method_params.get('exit'), None)
+
+                elif curr_instr.get_name()[:4] in ["aget", "aput"]:
+                    if curr_instr.get_name() in  ["aget", "aput"]:
+                        pass
+                    else:
+                        op, type = curr_instr.get_name().split('-')
+                        if type == "wide":
+                            self._etat_reg[curr_instr.get_register()[0]] = ('int', None)
+                            self._etat_reg[curr_instr.get_register()[0] + 1] = ('int', None)
+                        elif type in ["boolean", "byte", "char", "short"]:
+                            self._etat_reg[curr_instr.get_register()[0]] = (type, None)
 
                 elif curr_instr.get_name()[:4] in ['sget', 'sput']:
                     self._etat_reg[curr_instr.get_register()[0]] = curr_instr.get_field()
@@ -231,13 +237,17 @@ class Methode():
                 else:
                     print(
                         '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
+
+            elif curr_instr.get_name() == "fill-new-array":
+                offset_payload = curr_instr.get_destination() + curr_instr.get_length()
+                data = self._succ.get(offset_payload).get_constant()
+
             else:
                 print(f"\033[91mErreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)\033[0m")
             tmp_map_register[offset] = self._etat_reg
             to_do.pop(0)
             for child in destination:
                 to_do.insert(0, self._succ.get(child))
-        print("Fin d'analyse : methode valide")
         print(tmp_map_register)
         return is_valide
 
