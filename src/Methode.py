@@ -23,7 +23,7 @@ class Methode():
     def set_nb_reg(self, nb_reg):
         self._nb_reg = nb_reg
         for i in range(nb_reg):
-            self._etat_reg[i] = None
+            self._etat_reg[i] = (None, None)
 
     def set_instructions(self, instructions):
         self._instructions = instructions
@@ -39,7 +39,7 @@ class Methode():
         res = []
         for num, elem in self._succ.items():
             if number in elem[1]:
-                res.append(elem[0])
+                res.append(elem)
         return res
 
     def compute_succ(self):
@@ -75,26 +75,63 @@ class Methode():
         return res
 
     def evaluate(self):
-        print("\n")
-        print("=" * 20)
-        print("Début de l'analyse : Méthode " + self._name + "\n")
         offset = 0  # Début
         to_do = [self._succ.get(offset)]
         is_valide = True
         params = self._informations.get('params', [])
         print(self._informations)
+        last_move = (None, None)
         for num_reg, type in params:
             # Initialisation des types des registres en fonction des parametres de la methode
             if type not in self._primitive_to_dalvik.keys():
                 type = 'L'+type.replace(".", "/")+";"
-            self._etat_reg[num_reg] = type
+            self._etat_reg[num_reg] = (type, None)
         if not self._isStatic:
-            self._etat_reg[self._informations['registers'][1]] = self._class_name
+            self._etat_reg[self._informations['registers'][1]] = (self._class_name, None)
+
+        tmp_map_register = {}
+        for instruction_offset in self._succ.keys():
+            tmp_map_register[instruction_offset] = self._etat_reg
+
         while len(to_do) > 0:
             curr_instr, destination, offset = to_do[0]
             parents = self.get_parents_instruction(offset)
             print(curr_instr)
-            if curr_instr.get_name()[:6] == "invoke":
+            if len(parents) > 1:
+                for instr_parent, _, offset_parent in parents:
+                    parent_registers = tmp_map_register.get(offset_parent)
+                    for register, value in self._etat_reg.items():
+                        if value[0] and value[0][0] == 'L':
+                            if value[0] != parent_registers.get(register)[0]:
+                                #CheckHeritage
+                                pass # Todo
+                        else:
+                            if value[0] != parent_registers.get(register)[0]:
+                                print(f"Erreur de type sur la jointures des registres à l'instruction {curr_instr.get_name()}")
+                                is_valide = False
+
+            if curr_instr.get_name()[:4] == "move":
+                if curr_instr.get_name() in ['move', 'move-wide', 'move-object', 'move/from16', 'move-wide/from16', 'move-object/from16', 'move/16', 'move-wide/16', 'move-object/16']:
+                    if 'wide' in curr_instr.get_name():
+                        if curr_instr.get_register()[0] + 1 in self._etat_reg.keys():
+                            self._etat_reg[curr_instr.get_register()[0]] = self._etat_reg[curr_instr.get_register()[1]]
+                            self._etat_reg[curr_instr.get_register()[0] + 1] = self._etat_reg[curr_instr.get_register()[1] + 1]
+                            self._etat_reg[curr_instr.get_register()[1]] = (None, None)
+                            self._etat_reg[curr_instr.get_register()[1] + 1] = (None, None)
+                        else:
+                            print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                            is_valide = False
+                    else:
+                        self._etat_reg[curr_instr.get_register()[0]] = self._etat_reg.get(curr_instr.get_register()[1])
+                        self._etat_reg[curr_instr.get_register()[1]] = (None, None)
+                else:
+                    if last_move == (None, None):
+                        print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                        is_valide = False
+                    else:
+                        self._etat_reg[curr_instr.get_register()[0]] = last_move
+
+            elif curr_instr.get_name()[:6] == "invoke":
                 m = curr_instr.get_method()
                 if self._isStatic:
                     pass  # Todo
@@ -109,14 +146,12 @@ class Methode():
                                 '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
                                 str(curr_instr.get_register()[
                                     i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
-
+                        else:
+                            last_move = (method_params.get('exit'), None)
             elif curr_instr.get_name() == "return":
                 if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]]:
                     print("Erreur de type de retour")
-                    return False
-            elif curr_instr.get_name() == "move-result":
-                last_exit = method_params.get('exit', None)
-                self._etat_reg[curr_instr.get_register()[0]] = last_exit
+                    is_valide = False
             elif curr_instr.get_name()[:4] in ['sget', 'sput']:
                 self._etat_reg[curr_instr.get_register()[0]] = curr_instr.get_field()
             elif curr_instr.get_name() == "const-string":
@@ -124,7 +159,7 @@ class Methode():
             elif curr_instr.get_name() == "const":  # Todo : fusionner les deux const?
                 self._etat_reg[curr_instr.get_register()[0]] = 'int'
             elif curr_instr.get_name() == 'const/16' or curr_instr.get_name() == 'const/4':
-                self._etat_reg[curr_instr.get_register()[0]] = 'int'
+                self._etat_reg[curr_instr.get_register()[0]] = ('int', curr_instr.get_constant())
             elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                                            'shr-int', 'ushr-int']:
                 tab = curr_instr.get_register()
@@ -142,14 +177,14 @@ class Methode():
                 if self._etat_reg[tab[1]] != type or self._etat_reg[tab[2]] != type:
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' )\033[0m')
-                    return False
+                    is_valide = False
                 self._etat_reg[tab[0]] = type
             elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
                 tab = curr_instr.get_register()
                 if self._etat_reg[tab[1]] != 'int':
                     print(
                         '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)  \033[0m')
-                    return False
+                    is_valide = False
                 self._etat_reg[tab[0]] = 'int'
             elif curr_instr.get_name()[-5:] == '2addr':  # exemple :  sub-int/2addr
                 tab = curr_instr.get_register()
@@ -179,10 +214,10 @@ class Methode():
             else:
                 print(
                     '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
-
+            tmp_map_register[offset] = self._etat_reg
             to_do.pop(0)
             for child in destination:
-                to_do.append(self._succ.get(child))
+                to_do.insert(0, self._succ.get(child))
         print("Fin d'analyse : methode valide")
         return is_valide
 

@@ -402,7 +402,9 @@ class Instruction:
             # B: method reference index (16 bits)
             # C: first argument register (16 bits)
             # N = A + C - 1
-            pass  # Todo
+            for i in range(instr.A):
+                self._register.append(instr.CCCC + i)
+            self._method = instr.cm.get_method(instr.BBBB)
 
         elif self._name in ['not-int', 'neg-int', 'neg-long', 'not-long', 'neg-float', 'neg-double', 'int-to-long',
                             'int-to-float', 'int-to-double', 'long-to-int', 'long-to-float', 'long-to-double',
