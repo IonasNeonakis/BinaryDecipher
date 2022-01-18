@@ -1,3 +1,5 @@
+from sys import stderr
+
 class Methode():
     def __init__(self, method, class_name):
         self._nb_reg = None
@@ -106,7 +108,7 @@ class Methode():
                                 pass # Todo
                         else:
                             if value[0] != parent_registers.get(register)[0]:
-                                print(f"Erreur de type sur la jointures des registres à l'instruction {curr_instr.get_name()}")
+                                print(f"Erreur de type sur la jointures des registres à l'instruction {curr_instr.get_name()}", file=stderr)
                                 is_valide = False
 
             if self.check_registers_accessibility(curr_instr.get_register()):
@@ -120,22 +122,21 @@ class Methode():
                                 self._etat_reg[curr_instr.get_register()[1]] = (None, None)
                                 self._etat_reg[curr_instr.get_register()[1] + 1] = (None, None)
                             else:
-                                print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                                print(f"Erreur à l'instruction {curr_instr.get_name()}", file=stderr)
                                 is_valide = False
                         else:
                             self._etat_reg[curr_instr.get_register()[0]] = self._etat_reg.get(curr_instr.get_register()[1])
                             self._etat_reg[curr_instr.get_register()[1]] = (None, None)
                     else:
                         if last_move == (None, None):
-                            print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                            print(f"Erreur à l'instruction {curr_instr.get_name()}", file=stderr)
                             is_valide = False
                         else:
                             self._etat_reg[curr_instr.get_register()[0]] = last_move
 
                 elif curr_instr.get_name() == 'return-void':
                     if not self._informations['return'] == 'void':
-                        print(
-                            '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type de retour ne correspond pas.)\033[0m')
+                        print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type de retour ne correspond pas.)', file=stderr)
 
                 elif curr_instr.get_name() in ['const/4', 'const/16', 'const', 'const/high16']:
                     self._etat_reg[curr_instr.get_register()[0]] = ('int', curr_instr.get_constant())
@@ -145,7 +146,7 @@ class Methode():
                         self._etat_reg[curr_instr.get_register()[0]] = ('int', curr_instr.get_constant())
                         self._etat_reg[curr_instr.get_register()[0] + 1] = ('int', curr_instr.get_constant())
                     else:
-                        print(f"Erreur à l'instruction {curr_instr.get_name()}")
+                        print(f"Erreur à l'instruction {curr_instr.get_name()}", file=stderr)
                         is_valide = False
 
                 elif 'const-string' in curr_instr.get_name():
@@ -157,7 +158,7 @@ class Methode():
 
                 elif curr_instr.get_name() == "return":
                     if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]][0]:
-                        print("Erreur de type de retour")
+                        print("Erreur de type de retour", file=stderr)
                         is_valide = False
 
                 elif curr_instr.get_name()[:6] == "invoke":
@@ -166,15 +167,13 @@ class Methode():
                         pass  # Todo
                     else:
                         if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
-                            print(
-                                '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
+                            print('Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )', file=stderr)
                         method_params = self.get_method_params(m)
                         for i in range(1, len(curr_instr.get_register())):
                             if self._etat_reg.get(curr_instr.get_register()[i])[0] != method_params.get('entry')[i-1]:
-                                print(
-                                    '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
+                                print('Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
                                     str(curr_instr.get_register()[
-                                        i]) + ' ne correspond pas au type du parametre de la methode )\033[0m')
+                                        i]) + ' ne correspond pas au type du parametre de la methode )', file=stderr)
                             else:
                                 last_move = (method_params.get('exit'), None)
 
@@ -185,7 +184,7 @@ class Methode():
                                                'shr-int', 'ushr-int']:
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != 'int' or self._etat_reg[tab[2]][0] != 'int':
-                        print('Erreur dans les registres, ce ne sont pas des int')
+                        print('Erreur dans les registres, ce ne sont pas des int', file=stderr)
                     self._etat_reg[tab[0]] = ('int', None)
                 elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int',
                                                'xor-int', 'shl-int', 'shr-int', 'ushr-int', 'add-long', 'sub-long',
@@ -196,43 +195,44 @@ class Methode():
                     _, type = curr_instr.get_name().split("-")
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != type or self._etat_reg[tab[2]][0] != type:
-                        print(
-                            '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ' )\033[0m')
+                        print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type, file=stderr)
                         is_valide = False
                     self._etat_reg[tab[0]] = (type, None) #Todo
                 elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != 'int':
-                        print(
-                            '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)  \033[0m')
+                        print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)', file=stderr)
                         is_valide = False
                     self._etat_reg[tab[0]] = ('int', None)
                 elif curr_instr.get_name()[-5:] == '2addr':  # exemple :  sub-int/2addr
                     tab = curr_instr.get_register()
                     nom, type = curr_instr.get_name()[:-6].split('-')
                     if self._etat_reg[tab[0]][0] != type or self._etat_reg[tab[1]][0] != type:
-                        print(
-                            '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type + ')\033[0m')
+                        print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type, file=stderr)
                         # return False
                     # v0 ne change pas de type
                 elif curr_instr.get_name()[:2] == 'if':
                     _, name = curr_instr.get_name().split('-')
                     if len(name) == 2:  # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
                         if self._etat_reg[curr_instr.get_register()[0]][0] != self._etat_reg[curr_instr.get_register()[1]][0]:
-                            print(
-                                '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)\033[0m')
+                            print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)', file=stderr)
                     else:  # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
                         if self._etat_reg[curr_instr.get_register()[0]][0] == 'None':
-                            print(
-                                '\033[91m' + 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)\033[0m')
+                            print('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)', file=stderr)
                             # return False
                 elif curr_instr.get_name() == 'goto':
                     pass
+                # elif curr_instr.get_name() == 'new-instance':
+                #     if self._etat_reg[curr_instr.get_register()[0]][0] is None:
+                #         self._etat_reg[curr_instr.get_register()[0]] = (curr_instr.get_type(), None)
+                #         self.find_superclasses_of_class(curr_instr.get_type())
+                #     else:
+                #         self.find_superclasses_of_class(curr_instr.get_type())
+
                 else:
-                    print(
-                        '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m')
+                    print(curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py")
             else:
-                print(f"\033[91mErreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)\033[0m")
+                print(f"Erreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)", file=stderr)
             tmp_map_register[offset] = self._etat_reg
             to_do.pop(0)
             for child in destination:
@@ -247,6 +247,23 @@ class Methode():
             if registre not in self._etat_reg.keys():
                 return False
         return True
+
+    def find_superclasses_of_class(self, class_name):
+        classes_hierarchy = self._androguard_method.code.CM.vm.list_classes_hierarchy()
+        visited = []
+        # parcours en profondeur pour trouver la classe
+        superclasses = self.parcours_en_profondeur_dictionnaire(classes_hierarchy, [], class_name, visited)
+        print(superclasses)
+
+    def parcours_en_profondeur_dictionnaire(self, dico, parent, class_name, visited):
+        for key, values in dico.items():
+            visited.append(key)
+            parent.append(key)
+            for value in values:
+                if value == class_name:
+                    return parent
+                else:
+                    return self.parcours_en_profondeur_dictionnaire(value, parent, class_name, visited)
 
     def get_androguard_method(self):
         return self._androguard_method
