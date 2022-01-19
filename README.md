@@ -16,4 +16,4 @@ Ensuite il faut installer les dépendances :
 
 ```pip install -r requirements.txt```
 
-
+Une apk pour tester les 2 premières analyses est disponible dans le apk/TEST_APK_1.apk
