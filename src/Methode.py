@@ -121,7 +121,7 @@ class Methode():
                     for num, reg_val in registres_parentI.items():
                         type, value = reg_val
                         if type:
-                            if type[0] == 'L':
+                            if type[0] == 'L' or type[0][0] == 'L':
                                 # il s'agit d'un object
                                 if registres_parent.get(num)[0] == type:
                                     register_after_merge[num] = (type, value)
@@ -130,7 +130,9 @@ class Methode():
                                     pass #Todo
                             else:
                                 # il s'agit d'un primitif
-                                if registres_parent.get(num)[0] == type:
+                                if not registres_parent.get(num)[0]:
+                                    register_after_merge[num] = (type, value)
+                                elif registres_parent.get(num)[0] == type:
                                     register_after_merge[num] = (type, value)
                                 else:
                                     print(f"Erreur de merge a l'instruction {curr_instr.get_name()} : les parents {parents[0]} et {parents[i]} ne sont pas merge friendly.")
@@ -243,6 +245,8 @@ class Methode():
 
                 elif curr_instr.get_name()[:4] in ['sget', 'sput']:
                     self._etat_reg[curr_instr.get_register()[0]] = (curr_instr.get_field(), None)
+                    if 'wide' in curr_instr.get_name() and curr_instr.get_register()[0]+1 in self._etat_reg.keys():
+                        self._etat_reg[curr_instr.get_register()[0] + 1] = (curr_instr.get_field(), None)
 
                 elif curr_instr.get_name() in ['mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int', 'shl-int',
                                                'shr-int', 'ushr-int']:
