@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 
 from src import output_rapport
 from src.analyses import analyse_1
+from src.analyses import *
 
 
 class GUI():
@@ -94,7 +95,10 @@ class GUI():
             print("type d'analyse : " + str(self.varGr.get()) + "\n")
             if str(self.varGr.get()) == '1':
                 print("Début de l'analyse 1 (vérification de bytecode simple)")
-                resultat_analyse = analyse_1(self.apk_analisee, self._default.get(), error_string_manager)
+
+                analyse = Analyse(self.apk_analisee, self._default.get())
+                resultat_analyse = analyse.analyse_1(True)
+
                 if resultat_analyse == "Class not found":
                     print("Class not found")
                 elif resultat_analyse:

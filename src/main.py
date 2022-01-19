@@ -4,8 +4,6 @@ import androguard
 import androguard.misc
 
 from src.GUI import GUI
-from src.analyses import analyse_1
-
 
 def input_file(apk):
     a, d, dx = androguard.misc.AnalyzeAPK(apk)
