@@ -8,7 +8,6 @@ from io import StringIO
 from contextlib import redirect_stdout
 
 from src import output_rapport
-from src.analyses import analyse_1
 from src.analyses import *
 
 

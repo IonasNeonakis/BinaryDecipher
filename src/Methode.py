@@ -271,11 +271,11 @@ class Methode():
             to_do.pop(0)
             for child in destination:
                 to_do.insert(0, self._succ.get(child))
-                if doitPrint:
-                    print("Analyse de la méthode terminée")
-                    print("Contenu des registres après chaque instruction :")
-                    for k, v in self._tmp_map_register.items():
-                        print(f"    - {k} : {v}")
+        if doitPrint:
+            print("Analyse de la méthode terminée")
+            print("Contenu des registres après chaque instruction :")
+            for k, v in self._tmp_map_register.items():
+                print(f"    - {k} : {v}")
         return is_valide
 
     # méthode qui vérifie que les registres demandés par l'instruction sont bien accessibles dans le code

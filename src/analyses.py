@@ -44,7 +44,7 @@ class Analyse:
                     methode_rencontre.append(
                         curr_method)  # On ajoute la methode instanciée à la liste des méthodes de la classe
                 for methode in methode_rencontre:  # Pour chacunes des méthodes de la classe
-                    if doitPrint :
+                    if doitPrint:
                         print("\n")
                         methode.print()
                         print("Description des instructions de la méthode par androguard :")
@@ -64,7 +64,7 @@ class Analyse:
 
     def analyse3(self):
         if not self._methodes:
-            self.analyse_1(False)
+            self.analyse_1(False, )
         a, d, dx = self._apk_analisee
 
         permissions = a.get_permissions()
