@@ -97,7 +97,7 @@ class GUI():
 
                 analyse = Analyse(self.apk_analisee, self._default.get())
                 resultat_analyse = analyse.analyse_1(True, error_string_manager)
-
+                analyse.analyse3()
                 if resultat_analyse == "Class not found":
                     print("Class not found")
                 elif resultat_analyse:

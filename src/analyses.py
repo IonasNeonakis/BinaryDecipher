@@ -75,4 +75,9 @@ class Analyse:
 
         for methode in self._methodes:
             tmp = methode.get_tmp_map_register()
+            instructions = methode.get_instructions()
+            for instruction in instructions:
+                if instruction.get_method()[0] == 'Landroid/content/Intent':
+                    print('On a un Intent')
+                    registres = tmp[]
             #print(tmp)

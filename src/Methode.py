@@ -328,3 +328,6 @@ class Methode():
 
     def get_tmp_map_register(self):
         return self._tmp_map_register
+
+    def get_instructions(self):
+        return self._instructions
