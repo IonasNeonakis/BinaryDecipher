@@ -28,7 +28,7 @@ class GUI():
         self.creditLabel1 = tkinter.Label(self.creditframe, text="Pierre-Louis Bertrand")
         self.creditLabel2 = tkinter.Label(self.creditframe, text="Ionas Neonakis")
         self.creditLabel3 = tkinter.Label(self.creditframe, text="Thomas Quetier")
-        self.creditLabel4 = tkinter.Label(self.creditframe, text="Samir Toulharmine")
+        self.creditLabel4 = tkinter.Label(self.creditframe, text="Samir Toularhmine")
 
         self.choixduprogframe = tkinter.LabelFrame(self.mainframe, text="Analyse")
         self.label1 = tkinter.Label(self.choixduprogframe, text="Choix de l'APK")
@@ -41,12 +41,12 @@ class GUI():
         self._optionClass = tkinter.OptionMenu(self.choixduprogframe, self._default, *self._liste_class)
 
         self.label2 = tkinter.Label(self.choixduprogframe, text="Type d'analyse")
-        vals = [1, 2, 3, 4]
-        etiqs = ['Analyse 1', 'Analyse 2', 'Analyse 3', 'Analyse 4']
+        vals = [1, 2, 3]
+        etiqs = ['Analyse 1', 'Analyse 2', 'Analyse 3']
         self.varGr = tkinter.StringVar()
         self.varGr.set(vals[0])
         self.rb = []
-        for i in range(4):
+        for i in range(3):
             b = tkinter.Radiobutton(self.choixduprogframe, variable=self.varGr, text=etiqs[i], value=vals[i])
             self.rb.append(b)
 
@@ -100,9 +100,8 @@ class GUI():
 
                 if resultat_analyse == "Class not found":
                     print("Class not found")
-                elif resultat_analyse:
+                else:
                     output_rapport.output_success_report(self._default.get(), buffer_stdout)
-                elif not resultat_analyse:
                     error_string_manager.output_error_report(self._default.get())
 
     def load_class(self):

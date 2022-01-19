@@ -49,8 +49,7 @@ class Analyse:
                     self._methodes.append(methode)
                     if not is_valide:
                         if doitPrint:
-                            error_string_manager.add_error_string(methode.print())
-                        return False
+                            error_string_manager.add_error_string("\n" + methode.print())
                 return True
         return "Class not found"
 

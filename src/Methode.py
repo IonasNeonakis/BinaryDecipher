@@ -211,7 +211,7 @@ class Methode():
                     is_static = 'static' in curr_instr.get_name()
                     if not is_static and m[0] not in self._etat_reg.get(curr_instr.get_register()[0])[0]:
                         self.set_verbose_error(curr_instr,
-                                               '\033[91m Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )\033[0m')
+                                               'Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide.')
                         is_valide = False
                     method_params = self.get_method_params(m)
                     if len(method_params.get('entry')) != 0:
