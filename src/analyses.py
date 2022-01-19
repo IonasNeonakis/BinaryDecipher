@@ -45,12 +45,8 @@ class Analyse:
                         methode.get_androguard_method().show()
                     methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
                     #print(methode.get_succ())
-                    is_valide = methode.evaluate(doitPrint)  # On évalue la méthode
+                    methode.evaluate(doitPrint)  # On évalue la méthode
                     self._methodes.append(methode)
-                    if not is_valide:
-                        if doitPrint:
-                            if methode.print():
-                                error_string_manager.add_error_string("\n" + methode.print())
                 return True
         return "Class not found"
 

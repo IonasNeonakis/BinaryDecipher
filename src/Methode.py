@@ -376,14 +376,13 @@ class Methode():
     def set_verbose_error(self, curr_instr, detail):
         if self._error_string_manager is not None:
             pretty_print_etat_registres = ""
-            # for k, v in self._etat_reg:
-            #     pretty_print_etat_registres += f" - {k} : {v}\n"
+            for k, v in self._etat_reg.items():
+                pretty_print_etat_registres += f" - {k} : {v}\n"
             self._error_string_manager.add_error_string(
                 f"Erreur lors de l'analyse de l'instruction \"{curr_instr}\"\n"
-                f"État des registres lors de l'erreur :\n{self._etat_reg}"
-                f"Explication de l'erreur : {detail}"
+                f"État des registres lors de l'erreur :\n{pretty_print_etat_registres}"
+                f"Explication de l'erreur : {detail}\n"
             )
-
 
     def get_androguard_method(self):
         return self._androguard_method
