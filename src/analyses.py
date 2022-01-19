@@ -50,14 +50,37 @@ class Analyse:
                 return True
         return "Class not found"
 
-    def analyse2(self):
+    def analyse_2(self):
         if not self._methodes:
             self.analyse_1(False, None)
 
+        etats_objects = {}
         for methode in self._methodes:
             instructions = methode._instructions
+            print()
+            print("Nom de la méthode : " + methode._name)
             for instruction in instructions:
-                pass
+                if "new-instance" in instruction.get_name() or "new-array" in instruction.get_name():
+                    etats_objects[instruction.get_register()[0]] = (instruction.get_type(), True)
+                if "move-object" in instruction.get_name():
+                    val = etats_objects[instruction.get_register()[1]]
+                    etats_objects[instruction.get_register()[0]] = (val[0], val[1])
+                    etats_objects.pop(instruction.get_register()[1])
+                if "invoke-virtual" in instruction.get_name():
+                    context = instruction.get_register()[0]
+                    if context not in etats_objects or not etats_objects.get(context)[1]:
+                        print("Appel de methode sur un objet non initialisé :")
+                        instruction.to_string()
+
+            print()
+            if len(etats_objects) > 0:
+                print("Voici les objets qui ont été correctement initialisés :")
+                for reg, val in etats_objects.items():
+                    if(val[1]):
+                        print("Registre : ", reg, " de type ", val[0])
+            else:
+                print("Aucun objet à initialiser dans cette méthode")
+            etats_objects = {}
 
     def analyse3(self):
         if not self._methodes:

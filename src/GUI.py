@@ -103,13 +103,13 @@ class GUI():
                 print("Début de l'analyse 2 (bonne initialisation des objets)")
 
                 analyse = Analyse(self.apk_analisee, self._default.get())
-                # resultat_analyse = analyse.analyse_1(True, error_string_manager)
-                #
-                # if resultat_analyse == "Class not found":
-                #     print("Class not found")
-                # else:
-                #     output_rapport.output_success_report(self._default.get(), buffer_stdout)
-                #     error_string_manager.output_error_report(self._default.get())
+                resultat_analyse = analyse.analyse_2()
+
+                if resultat_analyse == "Class not found":
+                    print("Class not found")
+                else:
+                    output_rapport.output_success_report(self._default.get(), buffer_stdout)
+                    error_string_manager.output_error_report(self._default.get())
             if str(self.varGr.get()) == '3':
                 print("Début de l'analyse 3 (extraction des communications)")
 
