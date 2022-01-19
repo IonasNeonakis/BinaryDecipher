@@ -34,5 +34,4 @@ L'APK apk/TEST_APK_1.apk contient des cas de tests pour les analyses 1 et 2 (les
 L'APK apk/commu2.apk contient un cas de test pour l'analyse 3.
 
 
-Note : l'apk de test invalide contient un test qui fait planter le programme
 
