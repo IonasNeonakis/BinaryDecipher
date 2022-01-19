@@ -5,8 +5,7 @@ from PIL import ImageTk, Image
 from tkinter import filedialog
 import androguard
 
-from src.Communications import Communications
-from src.analyses import analyse_1
+from src.analyses import *
 
 
 class GUI():
@@ -88,11 +87,13 @@ class GUI():
         print("analyse : " + str(self.varGr.get()))
         if str(self.varGr.get()) == '1':
             #print("start analyse 1")
-            analyse_1(self.apk_analisee, self._default.get())
+            analyse = Analyse(self.apk_analisee, self._default.get())
+            #analyse.analyse_1(True)
 
             print("start communications")
-            com = Communications(self.apk_analisee)
-            com.analyse()
+            analyse.analyse3()
+            #com = Communications(self.apk_analisee, methode)
+            #com.analyse()
 
 
     def load_class(self):
