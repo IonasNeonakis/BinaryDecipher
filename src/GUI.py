@@ -88,11 +88,12 @@ class GUI():
         buffer_stdout = StringIO()
         error_string_manager = output_rapport.ErrorStringManager()
         with redirect_stdout(buffer_stdout):
-            print("apk : " + str(self._apkName))
-            print("class : " + str(self._default.get()))
-            print("analyse : " + str(self.varGr.get()))
+            print("Rapport d'analyse BinaryDecipher\n")
+            print("apk analysée : " + str(self._apkName))
+            print("classe analysée : " + str(self._default.get()))
+            print("type d'analyse : " + str(self.varGr.get()) + "\n")
             if str(self.varGr.get()) == '1':
-                print("start analyse 1")
+                print("Début de l'analyse 1 (vérification de bytecode simple)")
                 resultat_analyse = analyse_1(self.apk_analisee, self._default.get(), error_string_manager)
                 if resultat_analyse == "Class not found":
                     print("Class not found")

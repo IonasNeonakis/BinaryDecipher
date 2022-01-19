@@ -39,14 +39,16 @@ def analyse_1(apk_analisee, class_name, error_string_manager):
                 methode_rencontre.append(
                     curr_method)  # On ajoute la methode instanciée à la liste des méthodes de la classe
             for methode in methode_rencontre:  # Pour chacunes des méthodes de la classe
+                print("\n")
+                methode.print()
+                print("Description des instructions de la méthode par androguard :")
                 methode.get_androguard_method().show()
                 methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
-                print(methode.get_succ())
                 is_valide = methode.evaluate()
                 is_valide = True
                 if not is_valide:
                     error_string_manager.add_error_string("Erreur dans la methode : \n")
-                    methode.print()
+                    error_string_manager.add_error_string(methode.print())
                     return False
             return True
     return "Class not found"

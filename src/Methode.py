@@ -83,7 +83,6 @@ class Methode():
         to_do = [self._succ.get(offset)]
         is_valide = True
         params = self._informations.get('params', [])
-        print(self._informations)
         last_move = (None, None)
         for num_reg, type in params:
             # Initialisation des types des registres en fonction des parametres de la methode
@@ -100,7 +99,6 @@ class Methode():
         while len(to_do) > 0:
             curr_instr, destination, offset = to_do[0]
             parents = self.get_parents_instruction(offset)
-            print(curr_instr)
             if len(parents) > 1:
                 for instr_parent, _, offset_parent in parents:
                     parent_registers = tmp_map_register.get(offset_parent)
@@ -241,8 +239,10 @@ class Methode():
             to_do.pop(0)
             for child in destination:
                 to_do.insert(0, self._succ.get(child))
-        print("Fin d'analyse : methode valide")
-        print(tmp_map_register)
+        print("Analyse de la méthode terminée")
+        print("Contenu des registres après chaque instruction :")
+        for k, v in tmp_map_register.items():
+            print(f"    - {k} : {v}")
         return is_valide
 
     # méthode qui vérifie que les registres demandés par l'instruction sont bien accessibles dans le code
@@ -273,5 +273,7 @@ class Methode():
         return self._androguard_method
 
     def print(self):
-        print("Methode {\n    Informations : ", self._informations, "\n    Nombre de registre : ", self._nb_reg,
-              "\n    Instruction : ", self._instructions, "\n}")
+        instructions_pretty_print = ""
+        for instruction in self._instructions:
+            instructions_pretty_print += "      - " + str(instruction) + "\n"
+        print(f"Methode (\n    Informations : {self._informations} \n    Nombre de registre : {self._nb_reg}\n    Instructions : \n{instructions_pretty_print})")
