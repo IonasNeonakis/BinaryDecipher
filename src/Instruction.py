@@ -21,7 +21,7 @@ class Instruction:
                 # A: destination register (4 bits)
                 # B: source register (4 bits)
                 self._register.extend([instr.A, instr.B])
-                self._string = f"instruction {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
+                self._string = f"instruction : {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
 
             elif self._name in ['move/from16', 'move-wide/from16', 'move-object/from16']:
                 # Tout ces elements ont les mêmes attributs, exemple avec la doc de move/from16
@@ -29,7 +29,7 @@ class Instruction:
                 # A: destination register (8 bits)
                 # B: source register (16 bits)
                 self._register.extend([instr.AA, instr.BBBB])
-                self._string = f"instruction {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
+                self._string = f"instruction : {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
 
             elif self._name in ['move/16', 'move-wide/16', 'move-object/16']:
                 # Tout ces elements ont les mêmes attributs, exemple avec la doc de move/16
@@ -37,7 +37,7 @@ class Instruction:
                 # A: destination register (16 bits)
                 # B: source register (16 bits)
                 self._register.extend([instr.AAAA, instr.BBBB])
-                self._string = f"instruction {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
+                self._string = f"instruction : {self._name} déplace de v{self._register[1]} vers v{self._register[0]}"
 
             else:
                 # Dans ce cas il s'agit d'un move-result, move-result-wide, move-result-object, move-exception
@@ -45,7 +45,7 @@ class Instruction:
                 # move-result vAA
                 # A: destination register (8 bits)
                 self._register.append(instr.AA)
-                self._string = f"instruction {self._name} déplace dans v{self._register[0]} le résultat de l'invoke précédant"
+                self._string = f"instruction : {self._name} déplace dans v{self._register[0]} le résultat de l'invoke précédant"
 
         elif self._name == 'return-void':
             self._string = f"instruction : {self._name} ne fait rien (normal)"
@@ -55,7 +55,7 @@ class Instruction:
             # return-object vAA
             # A: return value register (8 bits)
             self._register.append(instr.AA)
-            self._string = f"instruction {self._name} renvoie la valeur de v{self._register[0]}"
+            self._string = f"instruction : {self._name} renvoie la valeur de v{self._register[0]}"
 
         elif self._name == 'const/4':
             # const/4 vA, #+B
@@ -79,7 +79,7 @@ class Instruction:
             # B: arbitrary 32-bit constant
             self._register.append(instr.AA)
             self._constant = instr.BBBBBBBB
-            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
+            self._string = f"instruction : {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
                            f" {self._constant}"
 
         elif self._name == 'const/high16':
@@ -87,8 +87,11 @@ class Instruction:
             # A: destination register (8 bits)
             # B: signed int (16 bits)
             self._register.append(instr.AA)
-            self._constant = instr.BBBB0000
-            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
+            if instr.formatted_operands:
+                self._constant = instr.formatted_operands[0]
+            else:
+                self._constant = instr.BBBB
+            self._string = f"instruction : {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
                            f" {self._constant}"
 
         elif self._name[:10] == 'const-wide':
@@ -102,8 +105,11 @@ class Instruction:
             elif self._name == 'const-wide':
                 self._constant = instr.BBBBBBBBBBBBBBBB
             elif self._name == 'const-wide/high16':
-                self._constant = instr.BBBB000000000000
-            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
+                if instr.formatted_operands[0]:
+                    self._constant = instr.formatted_operands[0]
+                else:
+                    self._constant = instr.BBBB
+            self._string = f"instruction : {self._name} enregistre dans v{self._register[0]} le/les litteraux suivant :" \
                            f" {self._constant}"
 
         elif self._name == 'const-string':
@@ -112,7 +118,7 @@ class Instruction:
             # B: string index
             self._register.append(instr.AA)
             self._string_value = instr.cm.get_string(instr.BBBB)
-            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} la valeur" \
+            self._string = f"instruction : {self._name} enregistre dans v{self._register[0]} la valeur " \
                            f"{self._string_value}"
 
         elif self._name == 'const-string/jumbo':
@@ -121,7 +127,7 @@ class Instruction:
             # B: string index
             self._register.append(instr.AA)
             self._string_value = instr.cm.get_string(instr.BBBBBBBB)
-            self._string = f"instruction {self._name} enregistre dans v{self._register[0]} la valeur" \
+            self._string = f"instruction : {self._name} enregistre dans v{self._register[0]} la valeur " \
                            f"{self._string_value}"
 
         elif self._name == 'const-class':
@@ -147,7 +153,7 @@ class Instruction:
             # B: type index (16 bits)
             self._type = instr.cm.get_type(instr.BBBB)
             self._register.append(instr.AA)
-            self._string = f"instruction {self._name} vérifie que la valeur du registre v{self._register[0]} " \
+            self._string = f"instruction : {self._name} vérifie que la valeur du registre v{self._register[0]} " \
                            f"soit de type {self._type}"
 
         elif self._name == 'instance-of':
@@ -157,7 +163,7 @@ class Instruction:
             # C: type index (16 bits)
             self._register.extend([instr.A, instr.B])
             self._type = instr.cm.get_type(instr.CCCC)
-            self._string = f"instruction {self._name} stock dans {self._register[0]} 1 si l'élément référencé " \
+            self._string = f"instruction : {self._name} stock dans {self._register[0]} 1 si l'élément référencé " \
                            f"dans v{self._register[1]} est du type {self._type}"
 
         elif self._name == 'array-length':
@@ -165,7 +171,7 @@ class Instruction:
             # A: destination register (4 bits)
             # B: array reference-bearing register (4 bits)
             self._register.extend([instr.A, instr.B])
-            self._string = f"instruction {self._name} stock dans v{self._register[0]} la taille en nombre d'entré " \
+            self._string = f"instruction : {self._name} stock dans v{self._register[0]} la taille en nombre d'entré " \
                            f"de la liste référencé dans v{self._register[1]}"
 
         elif self._name == 'new-instance':
@@ -184,7 +190,7 @@ class Instruction:
             # C: type index
             self._register.extend([instr.A, instr.B])
             self._type = instr.cm.get_type(instr.CCCC)
-            self._string = f"instruction {self._name} construit dans v{self._register[0]} une array de taille x " \
+            self._string = f"instruction : {self._name} construit dans v{self._register[0]} une array de taille x " \
                            f"contenu dans v{self._register[1]} de type {self._type}"
 
         elif self._name == 'filled-new-array':
@@ -203,7 +209,7 @@ class Instruction:
                 self._register.extend([instr.C, instr.D, instr.E, instr.F])
             elif instr.A == 5:
                 self._register.extend([instr.C, instr.D, instr.E, instr.F, instr.G])
-            self._string = f"instruction {self._name} construit une Array de taille {instr.A} de type {self._type}"
+            self._string = f"instruction : {self._name} construit une Array de taille {instr.A} de type {self._type}"
 
         elif self._name == 'filled-new-array/range':
             # filled-new-array/range {vCCCC .. vNNNN}, type@BBBB
@@ -220,7 +226,7 @@ class Instruction:
             # B: signed "branch" offset to table data pseudo-instruction (32 bits)
             self._register.append(instr.AA)
             self._destination = instr.BBBBBBBB * 2
-            self._string = f"instruction {self._name} rempli l'array de v{self._register[0]} avec le" \
+            self._string = f"instruction : {self._name} rempli l'array de v{self._register[0]} avec le" \
                            f" payload situé a +{self._destination} offset"
 
         elif self._name == "fill-array-data-payload":
@@ -232,13 +238,13 @@ class Instruction:
                 test.append(int.from_bytes(b, byteorder='little'))
                 i += instr.element_width
             self._constant = test
-            self._string = f"instruction {self._name} contient un payload  : {self._constant}"
+            self._string = f"instruction : {self._name} contient un payload  : {self._constant}"
 
         elif self._name == 'throw':
             # throw vAA
             # A: exception-bearing register (8 bits)
             self._register.append(instr.AA)
-            self._string = f"instruction {self._name} jette l'instruction contenu dans le registre v{self._register[0]}"
+            self._string = f"instruction : {self._name} jette l'instruction contenu dans le registre v{self._register[0]}"
 
         elif self._name == 'goto':
             # goto +AA
@@ -278,7 +284,7 @@ class Instruction:
             # or -1 if b < c. The "bias" listed for the floating point operations indicates how NaN comparisons are
             # treated: "gt bias" instructions return 1 for NaN comparisons, and "lt bias" instructions return -1.
             self._register.extend([instr.AA, instr.BB, instr.CC])
-            self._string = f"instruction {self._name} effectue la comparaison souhaité entre les float ou long dans" \
+            self._string = f"instruction : {self._name} effectue la comparaison souhaité entre les float ou long dans" \
                            f" les registres v{self._register[1]} et v{self._register[2]}. Le resultat est " \
                            f"stocké dans v{self._register[0]}"
 
@@ -333,7 +339,7 @@ class Instruction:
             # B: array register (8 bits)
             # C: index register (8 bits)
             self._register.extend([instr.AA, instr.BB, instr.CC])
-            self._string = f"instruction {self._name} effectue l'operation identifié sur l'objet d'index " \
+            self._string = f"instruction : {self._name} effectue l'operation identifié sur l'objet d'index " \
                            f"contenu dans v{self._register[2]} de l'array identifié par le registre" \
                            f" v{self._register[1]} stockant ou sourçant le valeur dans v{self._register[0]}"
 
@@ -358,7 +364,7 @@ class Instruction:
             # C: instance field reference index (16 bits)
             self._register.extend([instr.A, instr.B])
             self._field = instr.cm.get_field(instr.CCCC)
-            self._string = f"instruction {self._name} effectue l'operation identifié sur l'instance d'un objet" \
+            self._string = f"instruction : {self._name} effectue l'operation identifié sur l'instance d'un objet" \
                            f" stocké dans v{self._register[1]}, sur le champs {self._field} et stock/charge " \
                            f"dans v{self._register[0]}"
 
@@ -401,7 +407,7 @@ class Instruction:
             elif instr.A == 5:
                 self._register.extend([instr.C, instr.D, instr.E, instr.F, instr.G])
             self._method = instr.cm.get_method(instr.BBBB)
-            self._string = f"instruction {self._name} appelle la methode : {self._method} et utilise les registres : "
+            self._string = f"instruction : {self._name} appelle la methode : {self._method} et utilise les registres : "
             for i in range(len(self._register)):
                 self._string += f" v{self._register[i]}"
 
@@ -416,9 +422,10 @@ class Instruction:
             # B: method reference index (16 bits)
             # C: first argument register (16 bits)
             # N = A + C - 1
-            for i in range(instr.A):
+            for i in range(instr.AA):
                 self._register.append(instr.CCCC + i)
             self._method = instr.cm.get_method(instr.BBBB)
+            self._string = f"instruction : {self._name} appel un fonction avec plein d'args"
 
         elif self._name in ['not-int', 'neg-int', 'neg-long', 'not-long', 'neg-float', 'neg-double', 'int-to-long',
                             'int-to-float', 'int-to-double', 'long-to-int', 'long-to-float', 'long-to-double',
@@ -449,7 +456,7 @@ class Instruction:
             # 8f: int-to-short	A: destination register or pair (4 bits)
             # B: source register or pair (4 bits)
             self._register.extend([instr.A, instr.B])
-            self._string = f"instruction {self._name} effectue l'opération identifié sur le " \
+            self._string = f"instruction : {self._name} effectue l'opération identifié sur le " \
                            f"registre v{self._register[1]} et stock le resultat dans v{self._register[0]}"
 
         elif self._name in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int', 'or-int', 'xor-int',
@@ -525,7 +532,7 @@ class Instruction:
             # B: method handle index (16 bits)
             self._register.append(instr.AA)
             self._method_handle = instr.cm.get_method_handle(instr.BBBB)
-            self._string = f"instruction {self._name} stock dans v{self._register[0]} une référence vers le method handler {self._method_handle}"
+            self._string = f"instruction : {self._name} stock dans v{self._register[0]} une référence vers le method handler {self._method_handle}"
 
         elif self._name == 'const-method-type':
             # const-method-handle vAA, method_handle@BBBB
@@ -533,10 +540,10 @@ class Instruction:
             # B: method handle index (16 bits)
             self._register.append(instr.AA)
             self._prototype = instr.cm.get_proto(instr.BBBB)
-            self._string = f"instruction {self._name} stock dans v{self._register[0]} une référence du prototype de methode : {self._prototype}"
+            self._string = f"instruction : {self._name} stock dans v{self._register[0]} une référence du prototype de methode : {self._prototype}"
 
         elif self._name == "nop":
-            self._string = f"instruction {self._name} fait rien ??"
+            self._string = f"instruction : {self._name} fait rien ??"
 
         else:
             self._string = None
