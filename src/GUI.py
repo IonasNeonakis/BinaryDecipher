@@ -76,11 +76,7 @@ class GUI():
     def browse(self):
         self._apkName = filedialog.askopenfile(
             initialdir='../apk/',
-            title="Select a File",
-            filetypes=(("APK",
-                        "*.apk*"),
-                       ("all files",
-                        "*.*"))).name
+            title="Select a File").name
         self.btnBrowse['text'] = self._apkName
         self.load_class()
 
@@ -96,7 +92,9 @@ class GUI():
                 print("Début de l'analyse 1 (vérification de bytecode simple)")
 
                 analyse = Analyse(self.apk_analisee, self._default.get())
-                resultat_analyse = analyse.analyse_1(True, error_string_manager)
+                #resultat_analyse = analyse.analyse_2(True, error_string_manager)
+                resultat_analyse = ""
+                analyse.analyse2()
 
                 if resultat_analyse == "Class not found":
                     print("Class not found")

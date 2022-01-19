@@ -53,6 +53,15 @@ class Analyse:
                 return True
         return "Class not found"
 
+    def analyse2(self):
+        if not self._methodes:
+            self.analyse_1(False, None)
+
+        for methode in self._methodes:
+            instructions = methode._instructions
+            for instruction in instructions:
+                pass
+
     def analyse3(self):
         if not self._methodes:
             self.analyse_1(False, None)
