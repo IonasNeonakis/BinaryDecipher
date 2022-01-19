@@ -64,7 +64,7 @@ class Analyse:
 
     def analyse3(self):
         if not self._methodes:
-            self.analyse_1(False, )
+            self.analyse_1(False, None)
         a, d, dx = self._apk_analisee
 
         permissions = a.get_permissions()
