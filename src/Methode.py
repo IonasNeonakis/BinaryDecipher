@@ -102,7 +102,6 @@ class Methode():
         while len(to_do) > 0:
             curr_instr, destination, offset = to_do[0]
             parents = self.get_parents_instruction(offset)
-            # string_builder +=  curr_instr #FIXME je viens de le changer jsp si faut le print :) Ionas à 14h45 le 19/01
             if len(parents) > 1:
                 for instr_parent, _, offset_parent in parents:
                     parent_registers = self._tmp_map_register.get(offset_parent)
@@ -114,7 +113,8 @@ class Methode():
                         else:
                             if value[0] != parent_registers.get(register)[0]:
                                 if self._error_string_manager is not None:
-                                    self._error_string_manager.add_error_string(f"Erreur de type sur la jointures des registres à l'instruction {curr_instr.get_name()}")
+                                    self._error_string_manager.add_error_string(f"Erreur lors de l'analyse de l'instruction {curr_instr}")
+                                    self._error_string_manager.add_error_string(f"Erreur de type sur la jointure des registres à l'instruction {curr_instr.get_name()}")
                                 is_valide = False
 
             if self.check_registers_accessibility(curr_instr.get_register()):
@@ -300,6 +300,9 @@ class Methode():
                 return False
         return True
 
+    # def get_verbose_error(self, ):
+
+
     def find_superclasses_of_class(self, class_name):
         classes_hierarchy = self._androguard_method.code.CM.vm.list_classes_hierarchy()
         visited = []
@@ -324,7 +327,7 @@ class Methode():
         instructions_pretty_print = ""
         for instruction in self._instructions:
             instructions_pretty_print += "      - " + str(instruction) + "\n"
-        print(f"Methode (\n    Informations : {self._informations} \n    Nombre de registre : {self._nb_reg}\n    Instructions : \n{instructions_pretty_print})")
+        print(f"Méthode {self.get_androguard_method().name}{self.get_androguard_method().proto} (\n    Informations : {self._informations} \n    Nombre de registres : {self._nb_reg}\n    Instructions : \n{instructions_pretty_print})")
 
     def get_tmp_map_register(self):
         return self._tmp_map_register
