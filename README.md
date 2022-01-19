@@ -27,8 +27,9 @@ Ensuite, il est possible de sélectionner une classe à analyser puis une analys
 Une fois cela fait, un clic sur le bouton "Analyser" créera des fichiers de rapport dans le dossier out.
 
 CAS DE TESTS :
-L'APK apk/TEST_APK_1.apk contient des cas de tests pour les analyses 1 et 2 :
+L'APK apk/TEST_APK_1.apk contient des cas de tests pour les analyses 1 et 2 (les sources de ce fichier APK sont dans le dossier source_TEST_APK_1):
  - Pour essayer l'analyse 1, il est possible de sélectionner les classes commençant par "Check".
  - Pour essayer l'analyse 2, il faut sélectionner la classe CheckInheritance.
 
 L'APK apk/commu2.apk contient un cas de test pour l'analyse 3.
+
