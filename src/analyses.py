@@ -40,7 +40,7 @@ class Analyse:
                 for methode in methode_rencontre:  # Pour chacunes des méthodes de la classe
                     if doitPrint:
                         print("\n")
-                        methode.print()
+                        print(methode.print())
                         print("Description des instructions de la méthode par androguard :")
                         methode.get_androguard_method().show()
                     methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
@@ -49,7 +49,8 @@ class Analyse:
                     self._methodes.append(methode)
                     if not is_valide:
                         if doitPrint:
-                            error_string_manager.add_error_string("\n" + methode.print())
+                            if methode.print():
+                                error_string_manager.add_error_string("\n" + methode.print())
                 return True
         return "Class not found"
 
