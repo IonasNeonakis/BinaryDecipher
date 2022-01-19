@@ -92,9 +92,7 @@ class GUI():
                 print("Début de l'analyse 1 (vérification de bytecode simple)")
 
                 analyse = Analyse(self.apk_analisee, self._default.get())
-                #resultat_analyse = analyse.analyse_2(True, error_string_manager)
-                resultat_analyse = ""
-                analyse.analyse2()
+                resultat_analyse = analyse.analyse_1(True, error_string_manager)
 
                 if resultat_analyse == "Class not found":
                     print("Class not found")
