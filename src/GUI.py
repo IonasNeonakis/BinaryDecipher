@@ -4,7 +4,10 @@ from tkinter import ttk
 from PIL import ImageTk, Image
 from tkinter import filedialog
 import androguard
+from io import StringIO
+from contextlib import redirect_stdout
 
+from src import output_rapport
 from src.analyses import analyse_1
 
 
@@ -82,12 +85,21 @@ class GUI():
         self.load_class()
 
     def start_analyse(self):
-        print("apk : " + str(self._apkName))
-        print("class : " + str(self._default.get()))
-        print("analyse : " + str(self.varGr.get()))
-        if str(self.varGr.get()) == '1':
-            print("start analyse 1")
-            analyse_1(self.apk_analisee, self._default.get())
+        buffer_stdout = StringIO()
+        error_string_manager = output_rapport.ErrorStringManager()
+        with redirect_stdout(buffer_stdout):
+            print("apk : " + str(self._apkName))
+            print("class : " + str(self._default.get()))
+            print("analyse : " + str(self.varGr.get()))
+            if str(self.varGr.get()) == '1':
+                print("start analyse 1")
+                resultat_analyse = analyse_1(self.apk_analisee, self._default.get(), error_string_manager)
+                if resultat_analyse == "Class not found":
+                    print("Class not found")
+                elif resultat_analyse:
+                    output_rapport.output_success_report(self._default.get(), buffer_stdout)
+                elif not resultat_analyse:
+                    error_string_manager.output_error_report(self._default.get())
 
     def load_class(self):
         self._liste_class = []
