@@ -8,7 +8,8 @@ class ErrorStringManager:
         self.error_string = ""
 
     def add_error_string(self, error_string):
-        self.error_string += error_string + "\n"
+        if error_string is not None:
+            self.error_string += error_string + "\n"
 
     def get_error_string(self):
         return self.error_string

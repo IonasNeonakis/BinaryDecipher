@@ -51,12 +51,10 @@ class Analyse:
                         methode.get_androguard_method().show()
                     methode.compute_succ()  # On définit les offset des instructions et on calcule le successeur de chacunes
                     #print(methode.get_succ())
-                    methode.evaluate(doitPrint)
+                    is_valide = methode.evaluate(doitPrint)  # On évalue la méthode
                     self._methodes.append(methode)
-                    is_valide = True#methode.evaluate()  # On évalue la methode
                     if not is_valide:
                         if doitPrint:
-                            error_string_manager.add_error_string("Erreur dans la methode : \n")
                             error_string_manager.add_error_string(methode.print())
                         return False
                 return True

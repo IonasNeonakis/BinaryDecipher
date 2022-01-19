@@ -112,9 +112,7 @@ class Methode():
                                 pass  # Todo
                         else:
                             if value[0] != parent_registers.get(register)[0]:
-                                if self._error_string_manager is not None:
-                                    self._error_string_manager.add_error_string(f"Erreur lors de l'analyse de l'instruction {curr_instr}")
-                                    self._error_string_manager.add_error_string(f"Erreur de type sur la jointure des registres à l'instruction {curr_instr.get_name()}")
+                                self.set_verbose_error(curr_instr, f"Erreur de type sur la jointure des registres")
                                 is_valide = False
 
             if self.check_registers_accessibility(curr_instr.get_register()):
@@ -130,8 +128,7 @@ class Methode():
                                 self._etat_reg[curr_instr.get_register()[1]] = (None, None)
                                 self._etat_reg[curr_instr.get_register()[1] + 1] = (None, None)
                             else:
-                                if self._error_string_manager is not None:
-                                    self._error_string_manager.add_error_string(f"Erreur à l'instruction {curr_instr.get_name()}")
+                                self.set_verbose_error(curr_instr, f"Erreur à l'instruction")
                                 is_valide = False
                         else:
                             self._etat_reg[curr_instr.get_register()[0]] = self._etat_reg.get(
@@ -139,16 +136,14 @@ class Methode():
                             self._etat_reg[curr_instr.get_register()[1]] = (None, None)
                     else:
                         if last_move == (None, None):
-                            if self._error_string_manager is not None:
-                                self._error_string_manager.add_error_string(f"Erreur à l'instruction {curr_instr.get_name()}")
+                            self.set_verbose_error(curr_instr, f"Erreur à l'instruction")
                             is_valide = False
                         else:
                             self._etat_reg[curr_instr.get_register()[0]] = last_move
 
                 elif curr_instr.get_name() == 'return-void':
                     if not self._informations['return'] == 'void':
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type de retour ne correspond pas.)')
+                        self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type de retour ne correspond pas.)')
 
                 elif curr_instr.get_name() in ['const/4', 'const/16', 'const', 'const/high16']:
                     self._etat_reg[curr_instr.get_register()[0]] = ('int', curr_instr.get_constant())
@@ -158,8 +153,7 @@ class Methode():
                         self._etat_reg[curr_instr.get_register()[0]] = ('int', curr_instr.get_constant())
                         self._etat_reg[curr_instr.get_register()[0] + 1] = ('int', curr_instr.get_constant())
                     else:
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string(f"Erreur à l'instruction {curr_instr.get_name()}")
+                        self.set_verbose_error(curr_instr, f"Erreur à l'instruction")
                         is_valide = False
 
                 elif 'const-string' in curr_instr.get_name():
@@ -170,8 +164,7 @@ class Methode():
 
                 elif curr_instr.get_name() == "return":
                     if not self._informations['return'] == self._etat_reg[curr_instr.get_register()[0]][0]:
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string("Erreur de type de retour")
+                        self.set_verbose_error(curr_instr, "Erreur de type de retour")
                         is_valide = False
 
                 elif curr_instr.get_name()[
@@ -181,16 +174,14 @@ class Methode():
                         pass  # Todo
                     else:
                         if m[0] not in self._etat_reg.get(curr_instr.get_register()[0]):
-                            if self._error_string_manager is not None:
-                                self._error_string_manager.add_error_string('Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )')
+                            self.set_verbose_error(curr_instr, 'Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ' : contexte invalide. )')
                             is_valide = False
                         method_params = self.get_method_params(m)
                         for i in range(1, len(curr_instr.get_register())):
                             if self._etat_reg.get(curr_instr.get_register()[i])[0] != method_params.get('entry')[i-1]:
-                                if self._error_string_manager is not None:
-                                    self._error_string_manager.add_error_string('Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
-                                                                            str(curr_instr.get_register()[
-                                                                                    i]) + ' ne correspond pas au type du parametre de la methode )')
+                                self.set_verbose_error(curr_instr, 'Erreur dans l\'appel a la methode ' + curr_instr.get_name() + ', le type du registre v' +
+                                                       str(curr_instr.get_register()[
+                                                               i]) + ' ne correspond pas au type du parametre de la methode )')
                             else:
                                 last_move = (method_params.get('exit'), None)
 
@@ -216,8 +207,7 @@ class Methode():
                                                'shr-int', 'ushr-int']:
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != 'int' or self._etat_reg[tab[2]][0] != 'int':
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string('Erreur dans les registres, ce ne sont pas des int')
+                        self.set_verbose_error(curr_instr, 'Erreur dans les registres, ce ne sont pas des int')
                     self._etat_reg[tab[0]] = ('int', None)
                 elif curr_instr.get_name() in ['add-int', 'sub-int', 'mul-int', 'div-int', 'rem-int', 'and-int',
                                                'or-int',
@@ -230,35 +220,30 @@ class Methode():
                     _, type = curr_instr.get_name().split("-")
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != type or self._etat_reg[tab[2]][0] != type:
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type)
+                        self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type)
                         is_valide = False
                     self._etat_reg[tab[0]] = (type, None)  # Todo
                 elif curr_instr.get_name()[-4:] == 'lit8' or curr_instr.get_name()[-5:] == 'lit16':
                     tab = curr_instr.get_register()
                     if self._etat_reg[tab[1]][0] != 'int':
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)')
+                        self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des int)')
                         is_valide = False
                     self._etat_reg[tab[0]] = ('int', None)
                 elif curr_instr.get_name()[-5:] == '2addr':  # exemple :  sub-int/2addr
                     tab = curr_instr.get_register()
                     nom, type = curr_instr.get_name()[:-6].split('-')
                     if self._etat_reg[tab[0]][0] != type or self._etat_reg[tab[1]][0] != type:
-                        if self._error_string_manager is not None:
-                            self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type)
+                        self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', ce ne sont pas des ' + type)
                         # return False
                     # v0 ne change pas de type
                 elif curr_instr.get_name()[:2] == 'if':
                     _, name = curr_instr.get_name().split('-')
                     if len(name) == 2:  # si on est là ,if-eq,if-ne,if-lt,if-ge,if-gt,if-le
                         if self._etat_reg[curr_instr.get_register()[0]][0] != self._etat_reg[curr_instr.get_register()[1]][0]:
-                            if self._error_string_manager is not None:
-                                self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)')
+                            self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ',test d\'egalite sur des types differents)')
                     else:  # si on est là ,if-eqz,if-nez,if-ltz,if-gez,if-gtz,if-lez
                         if self._etat_reg[curr_instr.get_register()[0]][0] == 'None':
-                            if self._error_string_manager is not None:
-                                self._error_string_manager.add_error_string('Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)')
+                            self.set_verbose_error(curr_instr, 'Erreur dans les registres(méthode :  ' + curr_instr.get_name() + ', le type \'None\' n\'est pas comparable avec 0.)')
                             # return False
                 elif curr_instr.get_name() == 'goto':
                     pass
@@ -280,8 +265,7 @@ class Methode():
                     string_builder +=  '\033[91m' + curr_instr.get_name() + " n'est pas encore pris en compte dans Methode.py" + '\033[0m\n'
 
             else:
-                if self._error_string_manager is not None:
-                    self._error_string_manager.add_error_string(f"Erreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)")
+                self.set_verbose_error(curr_instr, f"Erreur dans les registres (méthode : {curr_instr.get_name()}, la méthode accède à des registres inaccessibles)")
             self._tmp_map_register[offset] = copy.deepcopy(self._etat_reg)
             to_do.pop(0)
             for child in destination:
@@ -300,7 +284,13 @@ class Methode():
                 return False
         return True
 
-    # def get_verbose_error(self, ):
+    def set_verbose_error(self, curr_instr, detail):
+        if self._error_string_manager is not None:
+            self._error_string_manager.add_error_string(
+                f"Erreur lors de l'analyse de l'instruction \"{curr_instr}\"\n"
+                f"État des registres lors de l'erreur {self._etat_reg}\n"
+                f"Explication de l'erreur : {detail}"
+            )
 
 
     def find_superclasses_of_class(self, class_name):
